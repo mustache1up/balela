@@ -20,6 +20,8 @@
 
 <script>
 import { ref, computed, onMounted, watch } from "vue";
+import { ref as databaseRef, set } from "firebase/database";
+import db from "../firebaseConfig"; // Importe a instância do Firebase configurada
 import router from "../router"; // Importe o router conforme mencionado anteriormente
 
 export default {
@@ -36,13 +38,17 @@ export default {
     let timer = null; // Declaração da variável timer
 
     const isMediator = computed(() => {
-      return props.mediatorName === props.currentPlayer;
+      props.mediatorName === props.currentPlayer;
+      return false;
     });
 
     function submitDefinition() {
-      // Lógica para enviar a definição do jogador...
-      console.log("Definição enviada:", playerDefinition.value);
-      // Implemente aqui a lógica para enviar a definição para o servidor, se necessário
+      // Enviar a definição do jogador para o Firebase
+      const definitionRef = databaseRef(db, "rooms/" + 0 + "/definitions/" + 0);
+      set(definitionRef, {
+        definition: playerDefinition.value,
+        votes: 0,
+      });
     }
 
     // Método para iniciar o temporizador
