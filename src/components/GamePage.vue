@@ -12,15 +12,15 @@
     </div>
 
     <!-- Mostrar a contagem regressiva -->
-    <div v-if="!isMediator && timeLeft > 0">
+    <div>
       <p>Tempo restante: {{ timeLeft }} segundos</p>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, watch } from "vue";
-import router from "../router"; // Certifique-se de corrigir o caminho para o arquivo router.js, se necessário
+import { ref, computed, onMounted, watch } from "vue";
+import router from "../router"; // Importe o router conforme mencionado anteriormente
 
 export default {
   props: {
@@ -33,39 +33,45 @@ export default {
     const playerDefinition = ref("");
     const timeLimit = 30; // Tempo limite em segundos
     const timeLeft = ref(timeLimit);
-
-    function submitDefinition() {
-      // Lógica para enviar a definição do jogador...
-    }
+    let timer = null; // Declaração da variável timer
 
     const isMediator = computed(() => {
       return props.mediatorName === props.currentPlayer;
     });
 
-    // Inicia a contagem regressiva quando o componente for criado
-    const timer = setInterval(() => {
-      timeLeft.value--;
-      if (timeLeft.value <= 0) {
-        clearInterval(timer);
-        // Redireciona para a VotingPage quando o tempo acabar
-        redirectToVotingPage();
-      }
-    }, 1000);
+    function submitDefinition() {
+      // Lógica para enviar a definição do jogador...
+      console.log("Definição enviada:", playerDefinition.value);
+      // Implemente aqui a lógica para enviar a definição para o servidor, se necessário
+    }
+
+    // Método para iniciar o temporizador
+    function startTimer() {
+      timer = setInterval(() => {
+        timeLeft.value--;
+        if (timeLeft.value <= 0) {
+          clearInterval(timer);
+          // Redireciona para a VotingPage quando o tempo acabar
+          redirectToVotingPage();
+        }
+      }, 1000);
+    }
+
+    // Chama o método startTimer quando o componente é criado
+    onMounted(startTimer);
 
     // Redireciona para a VotingPage
     function redirectToVotingPage() {
+      // Use router.push para redirecionar para a página de votação
       router.push("/voting");
     }
 
-    // Quando o componente for destruído, limpa o temporizador
-    watch(
-      () => timeLeft.value,
-      (newValue) => {
-        if (newValue <= 0) {
-          clearInterval(timer);
-        }
+    // Limpa o temporizador quando o componente é destruído
+    watch(timeLeft, (newValue) => {
+      if (newValue <= 0) {
+        clearInterval(timer);
       }
-    );
+    });
 
     return {
       playerDefinition,
