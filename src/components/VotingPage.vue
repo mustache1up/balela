@@ -1,14 +1,20 @@
 <template>
   <div>
     <h1>Página de Votação</h1>
-    <p>Mediador da rodada: {{ mediatorName }}</p>
-    <p>Palavra: {{ word }}</p>
 
-    <div v-for="(definition, index) in definitions" :key="index">
-      <button v-if="!isMediator" @click="vote(index)">{{ index + 1 }}</button>
-      <p v-else>
-        Definição do jogador {{ definition.player }}:
-        {{ definition.definition }}
+    <p v-if="isMediador">Você é o mediador da rodada!</p>
+    <p v-if="!isMediador">
+      Mediador da rodada: {{ sala.mediador || "MEDIADOR AQUI" }}
+    </p>
+
+    <p>Palavra: {{ sala.palavra || "PALAVRA AQUI" }}</p>
+
+    <div v-for="(jogador, idJogador) in sala.jogadores" :key="idJogador">
+      <button v-if="!isMediador" @click="votar(idJogador)">
+        Definição {{ idJogador }}: {{ votos[idJogador] || 0 }} votos
+      </button>
+      <p v-if="isMediador">
+        Definição {{ idJogador }}: {{ jogador.definicao }}
       </p>
     </div>
   </div>
@@ -16,52 +22,56 @@
 
 <script>
 import { ref, computed } from "vue";
-import { ref as databaseRef, set, onValue } from "firebase/database";
-import db from "../firebaseConfig"; // Importe a instância do Firebase configurada
+import { ref as dbRef, set, onValue } from "firebase/database";
+import db from "../firebaseConfig";
 
 export default {
-  props: {
-    mediatorName: String,
-    word: String,
-    // definitions: Array,
-    currentPlayer: String,
-  },
-  setup(props) {
-    // Carregar as definições dos jogadores
-    const definitionsRef = databaseRef(db, "rooms/" + 0 + "/definitions");
-    const definitions = ref([]);
+  props: {},
+  setup() {
+    const idSala = 0;
+    const idJogadorEuProprio = 0;
+    const sala = ref({ mediador: -1, jogadores: [], palavra: "NENHUMA" });
 
-    onValue(definitionsRef, (snapshot) => {
-      const data = snapshot.val();
-      const playerDefinitions = Object.entries(data).map(([player, value]) => ({
-        player,
-        definition: value.definition,
-        votes: value.votes,
-      }));
-      definitions.value = playerDefinitions;
+    const salaRef = dbRef(db, "salas/" + idSala);
+    onValue(salaRef, (snapshot) => {
+      const temp = snapshot.val();
+      sala.value = temp;
     });
 
-    const isMediator = computed(() => {
-      props.mediatorName === props.currentPlayer;
-      return false;
+    const isMediador = computed(() => {
+      return sala.value.mediador === idJogadorEuProprio;
     });
 
-    // Método para votar em uma definição
-    function vote(index) {
-      if (!isMediator.value) {
-        // Atualizar o número de votos da definição
-        const definitionRef = databaseRef(
+    const votos = computed(() => {
+      const votosArray = [];
+
+      for (const [idJogador, jogadorDaSala] of Object.entries(
+        sala.value.jogadores
+      )) {
+        idJogador; // TODO linter
+        votosArray[jogadorDaSala.votou_em] =
+          (votosArray[jogadorDaSala.votou_em] || 0) + 1;
+      }
+
+      return votosArray;
+    });
+
+    function votar(idJogadorNoQualVotar) {
+      if (!isMediador.value) {
+        const votouEmRef = dbRef(
           db,
-          "rooms/" + 0 + "/definitions/" + index + "/votes"
+          "salas/" + idSala + "/jogadores/" + idJogadorEuProprio + "/votou_em"
         );
-        set(definitionRef, 1);
+        // set(votouEmRef, increment(1));
+        set(votouEmRef, idJogadorNoQualVotar);
       }
     }
 
     return {
-      definitions,
-      isMediator,
-      vote,
+      sala,
+      isMediador,
+      votos,
+      votar,
     };
   },
 };

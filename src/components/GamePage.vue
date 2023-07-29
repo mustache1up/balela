@@ -3,12 +3,12 @@
     <h1>Rodada do Jogo</h1>
     <p>Mediador da rodada: {{ mediatorName }}</p>
     <p>Palavra: {{ word }}</p>
-    <p v-if="isMediator">Definição: {{ definition }}</p>
+    <p v-if="isMediador">Definição: {{ definicao }}</p>
 
-    <div v-if="!isMediator">
-      <label for="playerDefinition">Sua definição:</label>
-      <input type="text" id="playerDefinition" v-model="playerDefinition" />
-      <button @click="submitDefinition">Enviar Definição</button>
+    <div v-if="!isMediador">
+      <label for="definicaoDoJogador">Escreva sua definição:</label>
+      <input type="text" id="definicaoDoJogador" v-model="definicaoDoJogador" />
+      <button @click="submitDefinicao">Enviar definição</button>
     </div>
 
     <!-- Mostrar a contagem regressiva -->
@@ -28,27 +28,27 @@ export default {
   props: {
     mediatorName: String,
     word: String,
-    definition: String,
+    definicao: String,
     currentPlayer: String,
   },
   setup(props) {
-    const playerDefinition = ref("");
+    const definicaoDoJogador = ref("");
     const timeLimit = 30; // Tempo limite em segundos
     const timeLeft = ref(timeLimit);
     let timer = null; // Declaração da variável timer
 
-    const isMediator = computed(() => {
+    const isMediador = computed(() => {
       props.mediatorName === props.currentPlayer;
       return false;
     });
 
-    function submitDefinition() {
+    function submitDefinicao() {
       // Enviar a definição do jogador para o Firebase
-      const definitionRef = databaseRef(db, "rooms/" + 0 + "/definitions/" + 0);
-      set(definitionRef, {
-        definition: playerDefinition.value,
-        votes: 0,
-      });
+      const definicaoRef = databaseRef(
+        db,
+        "salas/" + 0 + "/jogadores/" + 0 + "/definicao"
+      );
+      set(definicaoRef, definicaoDoJogador.value);
     }
 
     // Método para iniciar o temporizador
@@ -80,9 +80,9 @@ export default {
     });
 
     return {
-      playerDefinition,
-      submitDefinition,
-      isMediator,
+      definicaoDoJogador,
+      submitDefinicao,
+      isMediador,
       timeLeft,
     };
   },
