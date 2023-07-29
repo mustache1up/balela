@@ -11,38 +11,28 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { ref as dbRef, update, getDatabase } from "firebase/database";
-import firebaseApp from "../firebaseConfig";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import router from "../router";
+import { ref, inject } from "vue";
+import { ref as dbRef, set } from "firebase/database";
 
-const db = getDatabase(firebaseApp);
 const idSala = 0;
 
-const idJogadorEuProprio = ref("NONE");
-
-onAuthStateChanged(getAuth(), (user) => {
-  if (user) {
-    idJogadorEuProprio.value = user.uid;
-    console.log("USER " + user.uid + " SIGNED");
-  } else {
-    console.log("USER NOT SIGNED");
-  }
-});
+const idJogadorEuProprio = inject("idJogadorEuProprio");
+const db = inject("db");
 
 const apelido = ref("");
 
 function entrarNaSala() {
   const jogadorRef = dbRef(
     db,
-    "salas/" + idSala + "/jogadores/" + idJogadorEuProprio.value
+    "salas/" + idSala + "/jogadores/" + idJogadorEuProprio.value + "/apelido"
   );
-  update(jogadorRef, { apelido: apelido.value });
-  router.push("/game");
+  set(jogadorRef, apelido.value);
+
+  const etapaRef = dbRef(db, "salas/" + idSala + "/etapa");
+  set(etapaRef, "definicoes");
 }
 </script>
 
 <style>
-/* Adicione estilos para a página de salas aqui */
+/* Estilos */
 </style>

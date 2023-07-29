@@ -4,7 +4,8 @@
 
     <p v-if="isMediador">Você é o mediador da rodada!</p>
     <p v-if="!isMediador">
-      Mediador da rodada: {{ sala.mediador || "MEDIADOR AQUI" }}
+      Mediador da rodada:
+      {{ sala.jogadores[sala.mediador].apelido || "MEDIADOR AQUI" }}
     </p>
 
     <p>Palavra: {{ sala.palavra || "PALAVRA AQUI" }}</p>
@@ -12,11 +13,7 @@
     <div v-for="(jogador, idJogador) in sala.jogadores" :key="idJogador">
       <button v-if="!isMediador" @click="votar(idJogador)">
         Definição {{ idJogador }}: {{ votos[idJogador] || 0 }} votos
-        {{
-          idJogador === sala.jogadores[idJogadorEuProprio].votou_em
-            ? "*votado*"
-            : ""
-        }}
+        {{ idJogador === meuVoto ? "*votado*" : "" }}
       </button>
       <p v-if="isMediador">
         Definição {{ idJogador }}: {{ jogador.definicao }}
@@ -25,80 +22,46 @@
   </div>
 </template>
 
-<script>
-import { ref, computed } from "vue";
-import { ref as dbRef, set, onValue, getDatabase } from "firebase/database";
-import firebaseApp from "../firebaseConfig";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+<script setup>
+import { computed, inject } from "vue";
+import { ref as dbRef, set } from "firebase/database";
 
-const db = getDatabase(firebaseApp);
+const idSala = 0;
+const sala = inject("sala");
+const idJogadorEuProprio = inject("idJogadorEuProprio");
+const db = inject("db");
+const isMediador = inject("isMediador");
 
-export default {
-  props: {},
-  setup() {
-    const idSala = 0;
-    const idJogadorEuProprio = ref("NONE");
-    const sala = ref({ mediador: -1, jogadores: [], palavra: "NENHUMA" });
+const meuVoto = computed(() => {
+  return sala.value.jogadores[idJogadorEuProprio]?.votou_em || -1;
+});
 
-    onAuthStateChanged(getAuth(), (user) => {
-      if (user) {
-        idJogadorEuProprio.value = user.uid;
-        console.log("USER " + user.uid + " SIGNED");
-      } else {
-        console.log("USER NOT SIGNED");
-      }
-    });
+const votos = computed(() => {
+  const votosArray = [];
 
-    const salaRef = dbRef(db, "salas/" + idSala);
-    onValue(salaRef, (snapshot) => {
-      const temp = snapshot.val();
-      sala.value = temp;
-    });
+  for (const [idJogador, jogadorDaSala] of Object.entries(
+    sala.value.jogadores
+  )) {
+    idJogador; // TODO linter
+    votosArray[jogadorDaSala.votou_em] =
+      (votosArray[jogadorDaSala.votou_em] || 0) + 1;
+  }
 
-    const isMediador = computed(() => {
-      return sala.value.mediador === idJogadorEuProprio.value;
-    });
+  return votosArray;
+});
 
-    const votos = computed(() => {
-      const votosArray = [];
-
-      for (const [idJogador, jogadorDaSala] of Object.entries(
-        sala.value.jogadores
-      )) {
-        idJogador; // TODO linter
-        votosArray[jogadorDaSala.votou_em] =
-          (votosArray[jogadorDaSala.votou_em] || 0) + 1;
-      }
-
-      return votosArray;
-    });
-
-    function votar(idJogadorNoQualVotar) {
-      if (!isMediador.value) {
-        const votouEmRef = dbRef(
-          db,
-          "salas/" +
-            idSala +
-            "/jogadores/" +
-            idJogadorEuProprio.value +
-            "/votou_em"
-        );
-        // set(votouEmRef, increment(1));
-        set(votouEmRef, idJogadorNoQualVotar);
-      }
-    }
-
-    return {
-      idJogadorEuProprio,
-      sala,
-      isMediador,
-      votos,
-      votar,
-    };
-  },
-};
+function votar(idJogadorNoQualVotar) {
+  if (!isMediador.value) {
+    const votouEmRef = dbRef(
+      db,
+      "salas/" + idSala + "/jogadores/" + idJogadorEuProprio.value + "/votou_em"
+    );
+    // set(votouEmRef, increment(1));
+    set(votouEmRef, idJogadorNoQualVotar);
+  }
+}
 </script>
 
 <style>
-/* Adicione estilos para a página de votação aqui */
+/* Estilos */
 </style>

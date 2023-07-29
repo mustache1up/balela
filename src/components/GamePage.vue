@@ -8,7 +8,7 @@
     <div v-if="!isMediador">
       <label for="definicaoDoJogador">Escreva sua definição:</label>
       <input type="text" id="definicaoDoJogador" v-model="definicaoDoJogador" />
-      <button @click="submitDefinicao">Enviar definição</button>
+      <button @click="enviarDefinicao">Enviar definição</button>
     </div>
 
     <div>
@@ -17,89 +17,51 @@
   </div>
 </template>
 
-<script>
-import { ref, computed, onMounted, watch } from "vue";
-import { ref as dbRef, set, getDatabase } from "firebase/database";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import firebaseApp from "../firebaseConfig";
-import router from "../router";
-const db = getDatabase(firebaseApp);
+<script setup>
+import { ref, onMounted, watch, inject } from "vue";
+import { ref as dbRef, set } from "firebase/database";
 
-export default {
-  props: {
-    mediatorName: String,
-    word: String,
-    definicao: String,
-    currentPlayer: String,
-  },
-  setup(props) {
-    const idJogadorEuProprio = ref("NONE"); // getAuth().currentUser.uid;
+const idSala = 0;
 
-    onAuthStateChanged(getAuth(), (user) => {
-      if (user) {
-        idJogadorEuProprio.value = user.uid;
-        console.log("USER " + user.uid + " SIGNED");
-      } else {
-        console.log("USER NOT SIGNED");
-      }
-    });
+const idJogadorEuProprio = inject("idJogadorEuProprio");
+const db = inject("db");
 
-    const definicaoDoJogador = ref("");
-    const timeLimit = 30; // Tempo limite em segundos
-    const timeLeft = ref(timeLimit);
-    let timer = null;
+const definicaoDoJogador = ref("");
+const timeLimit = 30; // Tempo limite em segundos
+const timeLeft = ref(timeLimit);
+let timer = null;
 
-    const isMediador = computed(() => {
-      props.mediatorName === props.currentPlayer;
-      return false;
-    });
+function enviarDefinicao() {
+  const definicaoRef = dbRef(
+    db,
+    "salas/" + idSala + "/jogadores/" + idJogadorEuProprio.value + "/definicao"
+  );
+  set(definicaoRef, definicaoDoJogador.value);
+}
 
-    function submitDefinicao() {
-      // Enviar a definição do jogador para o Firebase
-      const definicaoRef = dbRef(
-        db,
-        "salas/" + 0 + "/jogadores/" + idJogadorEuProprio.value + "/definicao"
-      );
-      set(definicaoRef, definicaoDoJogador.value);
+function startTimer() {
+  timer = setInterval(() => {
+    timeLeft.value--;
+    if (timeLeft.value <= 0) {
+      clearInterval(timer);
+      redirectToVotingPage();
     }
+  }, 1000);
+}
 
-    // Método para iniciar o temporizador
-    function startTimer() {
-      timer = setInterval(() => {
-        timeLeft.value--;
-        if (timeLeft.value <= 0) {
-          clearInterval(timer);
-          // Redireciona para a VotingPage quando o tempo acabar
-          redirectToVotingPage();
-        }
-      }, 1000);
-    }
+onMounted(startTimer);
 
-    // Chama o método startTimer quando o componente é criado
-    onMounted(startTimer);
+function redirectToVotingPage() {
+  const etapaRef = dbRef(db, "salas/" + idSala + "/etapa");
+  set(etapaRef, "votacao");
+}
 
-    // Redireciona para a VotingPage
-    function redirectToVotingPage() {
-      // Use router.push para redirecionar para a página de votação
-      router.push("/voting");
-    }
-
-    // Limpa o temporizador quando o componente é destruído
-    watch(timeLeft, (newValue) => {
-      if (newValue <= 0) {
-        clearInterval(timer);
-      }
-    });
-
-    return {
-      definicaoDoJogador,
-      submitDefinicao,
-      isMediador,
-      timeLeft,
-      idJogadorEuProprio,
-    };
-  },
-};
+// Limpa o temporizador quando o componente é destruído
+watch(timeLeft, (newValue) => {
+  if (newValue <= 0) {
+    clearInterval(timer);
+  }
+});
 </script>
 
 <style>
