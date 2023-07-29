@@ -1,8 +1,6 @@
-// firebaseConfig.js
 import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
-// Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAuNj8REHIb-xH5-wR6HdMoRYST3Cz-HLs",
   authDomain: "balela-game.firebaseapp.com",
@@ -14,8 +12,17 @@ const firebaseConfig = {
   measurementId: "G-VNZ716DZ08",
 };
 
-// Inicializar o Firebase com a configuração
 const firebaseApp = initializeApp(firebaseConfig);
-const db = getDatabase(firebaseApp);
 
-export default db;
+const auth = getAuth(firebaseApp);
+
+signInAnonymously(auth)
+  .then(() => {
+    console.log("aaaaaoooooooooooooooooo");
+  })
+  .catch((error) => {
+    console.log(error.code);
+    console.log(error.message);
+  });
+
+export default firebaseApp;

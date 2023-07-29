@@ -12,6 +12,11 @@
     <div v-for="(jogador, idJogador) in sala.jogadores" :key="idJogador">
       <button v-if="!isMediador" @click="votar(idJogador)">
         Definição {{ idJogador }}: {{ votos[idJogador] || 0 }} votos
+        {{
+          idJogador === sala.jogadores[idJogadorEuProprio].votou_em
+            ? "*votado*"
+            : ""
+        }}
       </button>
       <p v-if="isMediador">
         Definição {{ idJogador }}: {{ jogador.definicao }}
@@ -23,14 +28,26 @@
 <script>
 import { ref, computed } from "vue";
 import { ref as dbRef, set, onValue } from "firebase/database";
-import db from "../firebaseConfig";
+import firebaseApp from "../firebaseConfig";
+import { getDatabase } from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+const db = getDatabase(firebaseApp);
 
 export default {
   props: {},
   setup() {
     const idSala = 0;
-    const idJogadorEuProprio = 0;
+    const idJogadorEuProprio = ref("NONE"); // getAuth().currentUser.uid;
     const sala = ref({ mediador: -1, jogadores: [], palavra: "NENHUMA" });
+
+    onAuthStateChanged(getAuth(), (user) => {
+      if (user) {
+        idJogadorEuProprio.value = user.uid;
+        console.log("USER " + user.uid + " SIGNED");
+      } else {
+        console.log("USER NOT SIGNED");
+      }
+    });
 
     const salaRef = dbRef(db, "salas/" + idSala);
     onValue(salaRef, (snapshot) => {
@@ -39,7 +56,7 @@ export default {
     });
 
     const isMediador = computed(() => {
-      return sala.value.mediador === idJogadorEuProprio;
+      return sala.value.mediador === idJogadorEuProprio.value;
     });
 
     const votos = computed(() => {
@@ -60,7 +77,11 @@ export default {
       if (!isMediador.value) {
         const votouEmRef = dbRef(
           db,
-          "salas/" + idSala + "/jogadores/" + idJogadorEuProprio + "/votou_em"
+          "salas/" +
+            idSala +
+            "/jogadores/" +
+            idJogadorEuProprio.value +
+            "/votou_em"
         );
         // set(votouEmRef, increment(1));
         set(votouEmRef, idJogadorNoQualVotar);
@@ -68,6 +89,7 @@ export default {
     }
 
     return {
+      idJogadorEuProprio,
       sala,
       isMediador,
       votos,

@@ -6,9 +6,7 @@
 </template>
 
 <script>
-export default {
-  // Adicione a lógica do componente aqui, se necessário
-};
+export default {};
 </script>
 
 <style>
