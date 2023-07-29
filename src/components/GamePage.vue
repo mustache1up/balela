@@ -11,7 +11,6 @@
       <button @click="submitDefinicao">Enviar definição</button>
     </div>
 
-    <!-- Mostrar a contagem regressiva -->
     <div>
       <p>Tempo restante: {{ timeLeft }} segundos</p>
     </div>
@@ -20,9 +19,11 @@
 
 <script>
 import { ref, computed, onMounted, watch } from "vue";
-import { ref as databaseRef, set } from "firebase/database";
-import db from "../firebaseConfig"; // Importe a instância do Firebase configurada
-import router from "../router"; // Importe o router conforme mencionado anteriormente
+import { ref as dbRef, set, getDatabase } from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import firebaseApp from "../firebaseConfig";
+import router from "../router";
+const db = getDatabase(firebaseApp);
 
 export default {
   props: {
@@ -32,10 +33,21 @@ export default {
     currentPlayer: String,
   },
   setup(props) {
+    const idJogadorEuProprio = ref("NONE"); // getAuth().currentUser.uid;
+
+    onAuthStateChanged(getAuth(), (user) => {
+      if (user) {
+        idJogadorEuProprio.value = user.uid;
+        console.log("USER " + user.uid + " SIGNED");
+      } else {
+        console.log("USER NOT SIGNED");
+      }
+    });
+
     const definicaoDoJogador = ref("");
     const timeLimit = 30; // Tempo limite em segundos
     const timeLeft = ref(timeLimit);
-    let timer = null; // Declaração da variável timer
+    let timer = null;
 
     const isMediador = computed(() => {
       props.mediatorName === props.currentPlayer;
@@ -44,9 +56,9 @@ export default {
 
     function submitDefinicao() {
       // Enviar a definição do jogador para o Firebase
-      const definicaoRef = databaseRef(
+      const definicaoRef = dbRef(
         db,
-        "salas/" + 0 + "/jogadores/" + 0 + "/definicao"
+        "salas/" + 0 + "/jogadores/" + idJogadorEuProprio.value + "/definicao"
       );
       set(definicaoRef, definicaoDoJogador.value);
     }
@@ -84,6 +96,7 @@ export default {
       submitDefinicao,
       isMediador,
       timeLeft,
+      idJogadorEuProprio,
     };
   },
 };

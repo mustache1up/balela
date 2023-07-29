@@ -27,17 +27,17 @@
 
 <script>
 import { ref, computed } from "vue";
-import { ref as dbRef, set, onValue } from "firebase/database";
+import { ref as dbRef, set, onValue, getDatabase } from "firebase/database";
 import firebaseApp from "../firebaseConfig";
-import { getDatabase } from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 const db = getDatabase(firebaseApp);
 
 export default {
   props: {},
   setup() {
     const idSala = 0;
-    const idJogadorEuProprio = ref("NONE"); // getAuth().currentUser.uid;
+    const idJogadorEuProprio = ref("NONE");
     const sala = ref({ mediador: -1, jogadores: [], palavra: "NENHUMA" });
 
     onAuthStateChanged(getAuth(), (user) => {
