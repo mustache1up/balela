@@ -14,22 +14,25 @@
 import { ref, inject } from "vue";
 import { ref as dbRef, set } from "firebase/database";
 
-const idSala = 0;
-
-const idJogadorEuProprio = inject("idJogadorEuProprio");
 const db = inject("db");
+const idSala = inject("idSala");
+const idJogadorEuProprio = inject("idJogadorEuProprio");
+const mudaEtapa = inject("mudaEtapa");
 
 const apelido = ref("");
 
 function entrarNaSala() {
   const jogadorRef = dbRef(
     db,
-    "salas/" + idSala + "/jogadores/" + idJogadorEuProprio.value + "/apelido"
+    "salas/" +
+      idSala.value +
+      "/jogadores/" +
+      idJogadorEuProprio.value +
+      "/apelido"
   );
   set(jogadorRef, apelido.value);
 
-  const etapaRef = dbRef(db, "salas/" + idSala + "/etapa");
-  set(etapaRef, "definicoes");
+  mudaEtapa("definicoes");
 }
 </script>
 

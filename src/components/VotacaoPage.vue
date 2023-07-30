@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1>Página de Votação</h1>
+    <h1>Votação</h1>
+
+    <p>Palavra: {{ sala.palavra || "PALAVRA AQUI" }}</p>
 
     <p v-if="isMediador">Você é o mediador da rodada!</p>
     <p v-if="!isMediador">
@@ -8,16 +10,14 @@
       {{ sala.jogadores[sala.mediador].apelido || "MEDIADOR AQUI" }}
     </p>
 
-    <p>Palavra: {{ sala.palavra || "PALAVRA AQUI" }}</p>
-
     <div v-for="(jogador, idJogador) in sala.jogadores" :key="idJogador">
+      <p v-if="isMediador">
+        Definição {{ idJogador }}: {{ jogador.definicao }}
+      </p>
       <button v-if="!isMediador" @click="votar(idJogador)">
         Definição {{ idJogador }}: {{ votos[idJogador] || 0 }} votos
         {{ idJogador === meuVoto ? "*votado*" : "" }}
       </button>
-      <p v-if="isMediador">
-        Definição {{ idJogador }}: {{ jogador.definicao }}
-      </p>
     </div>
   </div>
 </template>
@@ -26,10 +26,10 @@
 import { computed, inject } from "vue";
 import { ref as dbRef, set } from "firebase/database";
 
-const idSala = 0;
+const idSala = inject("idSala");
+const db = inject("db");
 const sala = inject("sala");
 const idJogadorEuProprio = inject("idJogadorEuProprio");
-const db = inject("db");
 const isMediador = inject("isMediador");
 
 const meuVoto = computed(() => {
@@ -54,7 +54,11 @@ function votar(idJogadorNoQualVotar) {
   if (!isMediador.value) {
     const votouEmRef = dbRef(
       db,
-      "salas/" + idSala + "/jogadores/" + idJogadorEuProprio.value + "/votou_em"
+      "salas/" +
+        idSala.value +
+        "/jogadores/" +
+        idJogadorEuProprio.value +
+        "/votou_em"
     );
     // set(votouEmRef, increment(1));
     set(votouEmRef, idJogadorNoQualVotar);
