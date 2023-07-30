@@ -7,16 +7,14 @@
     <p v-if="isMediador">Você é o mediador da rodada!</p>
     <p v-if="!isMediador">
       Mediador da rodada:
-      {{ sala.jogadores[sala.mediador].apelido || "MEDIADOR AQUI" }}
+      {{ sala.jogadores[sala.mediador]?.apelido || "MEDIADOR AQUI" }}
     </p>
 
-    <div v-for="(jogador, idJogador) in sala.jogadores" :key="idJogador">
-      <p v-if="isMediador">
-        Definição {{ idJogador }}: {{ jogador.definicao }}
-      </p>
-      <button v-if="!isMediador" @click="votar(idJogador)">
-        Definição {{ idJogador }}: {{ votos[idJogador] || 0 }} votos
-        {{ idJogador === meuVoto ? "*votado*" : "" }}
+    <div v-for="def in definicoesPreparada" :key="def.letra">
+      <p v-if="isMediador">Definição {{ def.letra }}: {{ def.texto }}</p>
+      <button v-if="!isMediador" @click="votar(def.idJogador)">
+        Definição {{ def.letra }}: {{ votos[def.idJogador] || 0 }} votos
+        {{ def.idJogador === meuVoto ? "*votado*" : "" }}
       </button>
     </div>
   </div>
@@ -25,6 +23,8 @@
 <script setup>
 import { computed, inject } from "vue";
 import { ref as dbRef, set } from "firebase/database";
+import _ from "lodash";
+import sha1 from "crypto-js/sha1";
 
 const idSala = inject("idSala");
 const db = inject("db");
@@ -34,6 +34,21 @@ const isMediador = inject("isMediador");
 
 const meuVoto = computed(() => {
   return sala.value.jogadores[idJogadorEuProprio]?.votou_em || -1;
+});
+
+const definicoesPreparada = computed(() => {
+  return _(sala.value.jogadores)
+    .entries()
+    .map(([idJogador, jogador]) => {
+      const hash = sha1(jogador.definicao).toString();
+      return { hash, idJogador, texto: jogador.definicao };
+    })
+    .orderBy(["hash", "idJogador"])
+    .map((item, index) => {
+      const letra = String.fromCharCode(index + "A".charCodeAt(0));
+      return { ...item, letra };
+    })
+    .value();
 });
 
 const votos = computed(() => {

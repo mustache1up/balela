@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "crypto-js": "^4.1.1",
     "firebase": "^10.1.0",
+    "lodash": "^4.17.21",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4"
   },

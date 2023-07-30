@@ -32,6 +32,7 @@ function iniciarPartida() {
   }
 
   console.log(sala.value.jogadores);
+  // TODO mudar para 3 ou 4
   if (sala.value.jogadores.length < 2) {
     alert("É necessário pelo menos dois jogadores para iniciar a partida.");
     return;
