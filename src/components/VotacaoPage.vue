@@ -29,7 +29,7 @@
 
 <script setup>
 import { computed, inject } from "vue";
-import { ref as dbRef, set, increment } from "firebase/database";
+import { ref as dbRef, set, increment, update } from "firebase/database";
 import _ from "lodash";
 import sha1 from "crypto-js/sha1";
 
@@ -125,28 +125,25 @@ function encerrarVotacao() {
     return;
   }
   const pontosDaRodada = calculaPontosDaRodada();
-  _.each(pontosDaRodada, (pontosDaRodada, idJogador) => {
-    const pontosUltimaRodaraRef = dbRef(
-      db,
-      "salas/" +
-        idSala.value +
-        "/jogadores/" +
-        idJogador +
-        "/pontos_ultima_rodada"
-    );
-    set(pontosUltimaRodaraRef, pontosDaRodada);
 
-    const pontosRef = dbRef(
-      db,
-      "salas/" + idSala.value + "/jogadores/" + idJogador + "/pontos"
-    );
-    set(pontosRef, increment(pontosDaRodada));
+  const salaUpdates = {};
+  _.each(pontosDaRodada, (pontosDaRodada, idJogador) => {
+    salaUpdates["jogadores/" + idJogador + "/pontos_ultima_rodada"] =
+      pontosDaRodada;
+    salaUpdates["jogadores/" + idJogador + "/pontos"] =
+      increment(pontosDaRodada);
   });
 
-  const idProximoMediador = definirProximoMediador();
-  mudaEtapa("preparacao");
-  const mediadorRef = dbRef(db, "salas/" + idSala.value + "/mediador");
-  set(mediadorRef, idProximoMediador);
+  const salaRef = dbRef(db, "salas/" + idSala.value);
+  update(salaRef, salaUpdates)
+    .then(() => {
+      return mudaEtapa("preparacao");
+    })
+    .then(() => {
+      const idProximoMediador = definirProximoMediador();
+      const mediadorRef = dbRef(db, "salas/" + idSala.value + "/mediador");
+      set(mediadorRef, idProximoMediador);
+    });
 }
 </script>
 
