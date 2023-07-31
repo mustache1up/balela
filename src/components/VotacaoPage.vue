@@ -29,7 +29,7 @@
 
 <script setup>
 import { computed, inject } from "vue";
-import { ref as dbRef, set, increment, update } from "firebase/database";
+import { ref as dbRef, set, increment, update } from "@firebase/database";
 import _ from "lodash";
 import sha1 from "crypto-js/sha1";
 

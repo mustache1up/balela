@@ -12,7 +12,7 @@
 
 <script setup>
 import { ref, inject } from "vue";
-import { ref as dbRef, set } from "firebase/database";
+import { ref as dbRef, set } from "@firebase/database";
 
 const db = inject("db");
 const idSala = inject("idSala");

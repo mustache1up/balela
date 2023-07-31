@@ -1,4 +1,4 @@
-# dict-game
+# balela-game
 
 ## Project setup
 ```

@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import { initializeApp } from "@firebase/app";
+import { getAuth, signInAnonymously } from "@firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAuNj8REHIb-xH5-wR6HdMoRYST3Cz-HLs",

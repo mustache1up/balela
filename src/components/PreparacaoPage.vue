@@ -31,7 +31,7 @@
 
 <script setup>
 import { inject } from "vue";
-import { ref as dbRef, update, get } from "firebase/database";
+import { ref as dbRef, update, get } from "@firebase/database";
 
 const db = inject("db");
 const mudaEtapa = inject("mudaEtapa");

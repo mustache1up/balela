@@ -4,9 +4,9 @@
 
 <script setup>
 import { ref, computed, provide } from "vue";
-import { ref as dbRef, onValue, set, getDatabase } from "firebase/database";
+import { ref as dbRef, onValue, set, getDatabase } from "@firebase/database";
 import firebaseApp from "./firebaseConfig";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "@firebase/auth";
 
 import LobbyPage from "./components/LobbyPage.vue";
 import PreparacaoPage from "./components/PreparacaoPage.vue";
