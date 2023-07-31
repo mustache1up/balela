@@ -10,7 +10,7 @@
       {{ sala.jogadores[sala.mediador].apelido || "MEDIADOR AQUI" }}
     </p>
 
-    <p v-if="isMediador">Definição: {{ definicao }}</p>
+    <p v-if="isMediador">Os jogadores estão escrevendo suas definições!</p>
     <div v-if="!isMediador">
       <label for="definicaoDoJogador">Escreva sua definição:</label>
       <input type="text" id="definicaoDoJogador" v-model="definicaoDoJogador" />

@@ -17,12 +17,19 @@
         {{ def.idJogador === meuVoto ? "*votado*" : "" }}
       </button>
     </div>
+
+    <div v-if="isMediador">
+      <p>Faltam {{ qtdFaltaVotar }} votos!</p>
+      <button v-if="qtdFaltaVotar <= 0" @click="encerrarVotacao">
+        Encerrar votação
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed, inject } from "vue";
-import { ref as dbRef, set } from "firebase/database";
+import { ref as dbRef, set, increment } from "firebase/database";
 import _ from "lodash";
 import sha1 from "crypto-js/sha1";
 
@@ -31,6 +38,7 @@ const db = inject("db");
 const sala = inject("sala");
 const idJogadorEuProprio = inject("idJogadorEuProprio");
 const isMediador = inject("isMediador");
+const mudaEtapa = inject("mudaEtapa");
 
 const meuVoto = computed(() => {
   return sala.value.jogadores[idJogadorEuProprio]?.votou_em || -1;
@@ -38,10 +46,9 @@ const meuVoto = computed(() => {
 
 const definicoesPreparada = computed(() => {
   return _(sala.value.jogadores)
-    .entries()
-    .map(([idJogador, jogador]) => {
-      const hash = sha1(jogador.definicao).toString();
-      return { hash, idJogador, texto: jogador.definicao };
+    .map((jogadorDaSala, idJogador) => {
+      const hash = sha1(jogadorDaSala.definicao).toString();
+      return { hash, idJogador, texto: jogadorDaSala.definicao };
     })
     .orderBy(["hash", "idJogador"])
     .map((item, index) => {
@@ -52,32 +59,94 @@ const definicoesPreparada = computed(() => {
 });
 
 const votos = computed(() => {
-  const votosArray = [];
+  return _(sala.value.jogadores).countBy("votou_em").value();
+});
 
-  for (const [idJogador, jogadorDaSala] of Object.entries(
-    sala.value.jogadores
-  )) {
-    idJogador; // TODO linter
-    votosArray[jogadorDaSala.votou_em] =
-      (votosArray[jogadorDaSala.votou_em] || 0) + 1;
-  }
-
-  return votosArray;
+const qtdFaltaVotar = computed(() => {
+  const qtdJogadores = _.reject(sala.value.jogadores, (o, k) => {
+    return k === sala.value.mediador;
+  }).length;
+  const qtdTotalVotos = _.filter(sala.value.jogadores, "votou_em").length;
+  return qtdJogadores - qtdTotalVotos;
 });
 
 function votar(idJogadorNoQualVotar) {
-  if (!isMediador.value) {
-    const votouEmRef = dbRef(
+  if (isMediador.value) {
+    return;
+  }
+
+  const votouEmRef = dbRef(
+    db,
+    "salas/" +
+      idSala.value +
+      "/jogadores/" +
+      idJogadorEuProprio.value +
+      "/votou_em"
+  );
+  set(votouEmRef, idJogadorNoQualVotar);
+}
+
+function calculaPontosDaRodada() {
+  const pontosDaRodada = _.mapValues(sala.value.jogadores, () => 0);
+  const idMediador = sala.value.mediador;
+  pontosDaRodada[idMediador] = 3;
+
+  _.each(sala.value.jogadores, (jogadorDaSala, idJogadorQueVotou) => {
+    const idJogadorQueRecebeuOVoto = jogadorDaSala.votou_em;
+    if (idJogadorQueVotou === idMediador) {
+      // mediador nao vota, nada a fazer
+    } else if (!idJogadorQueRecebeuOVoto) {
+      // nao votou, nada a fazer
+    } else if (idJogadorQueRecebeuOVoto === idJogadorQueVotou) {
+      // votou na propria, nenhum ponto
+    } else if (idJogadorQueRecebeuOVoto === idMediador) {
+      // votou na certa, dois pontos
+      pontosDaRodada[idJogadorQueVotou] += 2;
+      // alguem votou na certa, mediador nao recebe pontos
+      pontosDaRodada[idMediador] = 0;
+    } else {
+      // votou em jogador, jogador recebe um ponto
+      pontosDaRodada[idJogadorQueRecebeuOVoto] += 1;
+    }
+  });
+
+  return pontosDaRodada;
+}
+
+function definirProximoMediador() {
+  const idJogadores = Object.keys(sala.value.jogadores);
+  const indiceMediadorAtual = idJogadores.indexOf(sala.value.mediador);
+  const indiceProximoMediador = (indiceMediadorAtual + 1) % idJogadores.length;
+  return idJogadores[indiceProximoMediador];
+}
+
+function encerrarVotacao() {
+  if (!isMediador.value || qtdFaltaVotar.value > 0) {
+    return;
+  }
+  const pontosDaRodada = calculaPontosDaRodada();
+  _.each(pontosDaRodada, (pontosDaRodada, idJogador) => {
+    const pontosUltimaRodaraRef = dbRef(
       db,
       "salas/" +
         idSala.value +
         "/jogadores/" +
-        idJogadorEuProprio.value +
-        "/votou_em"
+        idJogador +
+        "/pontos_ultima_rodada"
     );
-    // set(votouEmRef, increment(1));
-    set(votouEmRef, idJogadorNoQualVotar);
-  }
+    set(pontosUltimaRodaraRef, pontosDaRodada);
+
+    const pontosRef = dbRef(
+      db,
+      "salas/" + idSala.value + "/jogadores/" + idJogador + "/pontos"
+    );
+    set(pontosRef, increment(pontosDaRodada));
+  });
+
+  const idProximoMediador = definirProximoMediador();
+  mudaEtapa("preparacao");
+  const mediadorRef = dbRef(db, "salas/" + idSala.value + "/mediador");
+  set(mediadorRef, idProximoMediador);
 }
 </script>
 
