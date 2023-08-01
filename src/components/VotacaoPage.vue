@@ -2,39 +2,36 @@
   <div>
     <h1>Votação</h1>
 
-    <p>Palavra: {{ sala.palavra || "PALAVRA AQUI" }}</p>
+    <p>Palavra: {{ sala.palavra || 'PALAVRA AQUI' }}</p>
 
     <p v-if="isMediador">Você é o mediador da rodada!</p>
     <p v-if="!isMediador">
       Mediador da rodada:
-      {{ sala.jogadores[sala.mediador]?.apelido || "MEDIADOR AQUI" }}
+      {{ sala.jogadores[sala.mediador]?.apelido || 'MEDIADOR AQUI' }}
     </p>
 
     <div v-for="def in definicoesPreparada" :key="def.letra">
       <p v-if="isMediador">Definição {{ def.letra }}: {{ def.texto }}</p>
       <button v-if="!isMediador" @click="votar(def.idJogador)">
         Definição {{ def.letra }}: {{ votos[def.idJogador] || 0 }} votos
-        {{ def.idJogador === meuVoto ? "*votado*" : "" }}
+        {{ def.idJogador === meuVoto ? '*votado*' : '' }}
       </button>
     </div>
 
     <div v-if="isMediador">
       <p>Faltam {{ qtdFaltaVotar }} votos!</p>
-      <button v-if="qtdFaltaVotar <= 0" @click="encerrarVotacao">
-        Encerrar votação
-      </button>
+      <button v-if="qtdFaltaVotar <= 0" @click="encerrarVotacao">Encerrar votação</button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, inject } from "vue";
-import { ref as dbRef, set, increment, update } from "@firebase/database";
+import { set, increment, update } from "@firebase/database";
 import _ from "lodash";
 import sha1 from "crypto-js/sha1";
 
-const idSala = inject("idSala");
-const db = inject("db");
+const dbRefs = inject("dbRefs");
 const sala = inject("sala");
 const idJogadorEuProprio = inject("idJogadorEuProprio");
 const isMediador = inject("isMediador");
@@ -75,15 +72,7 @@ function votar(idJogadorNoQualVotar) {
     return;
   }
 
-  const votouEmRef = dbRef(
-    db,
-    "salas/" +
-      idSala.value +
-      "/jogadores/" +
-      idJogadorEuProprio.value +
-      "/votou_em"
-  );
-  set(votouEmRef, idJogadorNoQualVotar);
+  set(dbRefs.eu.votouEm, idJogadorNoQualVotar);
 }
 
 function calculaPontosDaRodada() {
@@ -128,21 +117,17 @@ function encerrarVotacao() {
 
   const salaUpdates = {};
   _.each(pontosDaRodada, (pontosDaRodada, idJogador) => {
-    salaUpdates["jogadores/" + idJogador + "/pontos_ultima_rodada"] =
-      pontosDaRodada;
-    salaUpdates["jogadores/" + idJogador + "/pontos"] =
-      increment(pontosDaRodada);
+    salaUpdates["jogadores/" + idJogador + "/pontos_ultima_rodada"] = pontosDaRodada;
+    salaUpdates["jogadores/" + idJogador + "/pontos"] = increment(pontosDaRodada);
   });
 
-  const salaRef = dbRef(db, "salas/" + idSala.value);
-  update(salaRef, salaUpdates)
+  update(dbRefs.sala, salaUpdates)
     .then(() => {
       return mudaEtapa("preparacao");
     })
     .then(() => {
       const idProximoMediador = definirProximoMediador();
-      const mediadorRef = dbRef(db, "salas/" + idSala.value + "/mediador");
-      set(mediadorRef, idProximoMediador);
+      set(dbRefs.mediador, idProximoMediador);
     });
 }
 </script>

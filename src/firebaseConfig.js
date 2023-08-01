@@ -9,7 +9,7 @@ const firebaseConfig = {
   storageBucket: "balela-game.appspot.com",
   messagingSenderId: "466039078209",
   appId: "1:466039078209:web:eca2bdab36d68cd9bc75c0",
-  measurementId: "G-VNZ716DZ08",
+  measurementId: "G-VNZ716DZ08"
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
