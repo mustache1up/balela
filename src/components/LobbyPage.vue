@@ -20,7 +20,7 @@ const mudaEtapa = inject("mudaEtapa");
 const apelido = ref("");
 
 function entrarNaSala() {
-  set(dbRefs.eu.apelido, apelido.value);
+  set(dbRefs.value.eu.apelido, apelido.value);
 
   mudaEtapa("definicoes");
 }

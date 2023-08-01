@@ -38,7 +38,7 @@ const isMediador = inject("isMediador");
 const mudaEtapa = inject("mudaEtapa");
 
 const meuVoto = computed(() => {
-  return sala.value.jogadores[idJogadorEuProprio]?.votou_em || -1;
+  return sala.value.jogadores[idJogadorEuProprio]?.votou_em;
 });
 
 const definicoesPreparada = computed(() => {

@@ -11,14 +11,15 @@
     </p>
 
     <h3>Jogadores na Sala:</h3>
-    <ul>
-      <li v-for="(jogador, idJogador) in sala.jogadores" :key="idJogador">
-        {{ jogador.apelido }} ({{ jogador.pontos || 0 }} pontos)
+    <!-- TODO: marcar tags de "você!" e "mediador"  -->
+    <div>
+      <p class="item-jogador" v-for="(jogador, idJogador) in sala.jogadores" :key="idJogador">
+        <strong>{{ jogador.apelido }}</strong> ({{ jogador.pontos || 0 }} pontos)
         <span v-if="jogador.pontos_ultima_rodada">
           [{{ jogador.pontos_ultima_rodada }} da última rodada!]
         </span>
-      </li>
-    </ul>
+      </p>
+    </div>
 
     <div v-if="isMediador">
       <button @click="iniciarRodada">Iniciar Rodada</button>
@@ -46,10 +47,11 @@ function iniciarRodada() {
   }
 
   if (sala.value.jogadores.length < quantidadeMinimaJogadores) {
-    alert("É necessário pelo menos dois jogadores para iniciar a rodada.");
+    alert("É necessário pelo menos " + quantidadeMinimaJogadores + " jogadores para iniciar a rodada.");
     return;
   }
 
+  // TODO: dar cinco opcoes de palavras para o mediador escolher (sem as definicoes)
   // TODO: gravar todas que foram na sala para nao repetir?
   get(dbRefs.palavras)
     .then((snapshot) => {
@@ -57,7 +59,6 @@ function iniciarRodada() {
       var keys = Object.keys(palavras);
       const palavra = keys[(keys.length * Math.random()) << 0];
       const definicao = palavras[palavra];
-
       const fimTempo = Math.round(Date.now() / 1000) + tempoParaDefinicoesEmSegundos;
 
       const salaUpdates = {};
@@ -77,5 +78,7 @@ function iniciarRodada() {
 </script>
 
 <style>
-/* Estilos */
+.item-jogador {
+  padding-left: 20px;
+}
 </style>
