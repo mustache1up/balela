@@ -33,8 +33,8 @@
 <script setup>
 import { inject } from "vue";
 import { update, get } from "@firebase/database";
+import { dbRef } from "../firebaseConfig";
 
-const dbRefs = inject("dbRefs");
 const mudaEtapa = inject("mudaEtapa");
 const isMediador = inject("isMediador");
 const sala = inject("sala");
@@ -53,7 +53,7 @@ function iniciarRodada() {
 
   // TODO: dar cinco opcoes de palavras para o mediador escolher (sem as definicoes)
   // TODO: gravar todas que foram na sala para nao repetir?
-  get(dbRefs.palavras)
+  get(dbRef("palavras"))
     .then((snapshot) => {
       const palavras = snapshot.val();
       var keys = Object.keys(palavras);
@@ -69,7 +69,7 @@ function iniciarRodada() {
       salaUpdates["fim_tempo"] = fimTempo;
       salaUpdates["palavra"] = palavra;
       salaUpdates["jogadores/" + sala.value.mediador + "/definicao"] = definicao;
-      return update(dbRefs.sala, salaUpdates);
+      return update(dbRef("salas/" + sala.value.id), salaUpdates);
     })
     .then(() => {
       mudaEtapa("definicoes");

@@ -26,12 +26,13 @@
 </template>
 
 <script setup>
+import _ from "lodash";
 import { computed, inject } from "vue";
 import { set, increment, update } from "@firebase/database";
-import _ from "lodash";
+import { dbRef } from "../firebaseConfig";
 import sha1 from "crypto-js/sha1";
 
-const dbRefs = inject("dbRefs");
+
 const sala = inject("sala");
 const idJogadorEuProprio = inject("idJogadorEuProprio");
 const isMediador = inject("isMediador");
@@ -72,7 +73,7 @@ function votar(idJogadorNoQualVotar) {
     return;
   }
 
-  set(dbRefs.eu.votouEm, idJogadorNoQualVotar);
+  set(dbRef("salas/" + sala.value.id + "/jogadores/" + idJogadorEuProprio.value + "/votou_em"), idJogadorNoQualVotar);
 }
 
 function calculaPontosDaRodada() {
@@ -121,13 +122,13 @@ function encerrarVotacao() {
     salaUpdates["jogadores/" + idJogador + "/pontos"] = increment(pontosDaRodada);
   });
 
-  update(dbRefs.sala, salaUpdates)
+  update(dbRef("salas/" + sala.value.id), salaUpdates)
     .then(() => {
       return mudaEtapa("preparacao");
     })
     .then(() => {
       const idProximoMediador = definirProximoMediador();
-      set(dbRefs.mediador, idProximoMediador);
+      set(dbRef("salas/" + sala.value.id + "/mediador"), idProximoMediador);
     });
 }
 </script>

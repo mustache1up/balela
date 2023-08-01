@@ -5,9 +5,9 @@
 <script setup>
 import _ from "lodash";
 import { ref, computed, provide } from "vue";
-import { ref as dbRef, onValue, set, getDatabase } from "@firebase/database";
+import { onValue, set } from "@firebase/database";
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
-import firebaseApp from "./firebaseConfig";
+import { dbRef } from "./firebaseConfig";
 
 import ConexaoPage from "./components/ConexaoPage.vue";
 import LobbyPage from "./components/LobbyPage.vue";
@@ -15,34 +15,11 @@ import PreparacaoPage from "./components/PreparacaoPage.vue";
 import DefinicoesPage from "./components/DefinicoesPage.vue";
 import VotacaoPage from "./components/VotacaoPage.vue";
 
-const db = getDatabase(firebaseApp);
-
-const idSala = ref(0); // TODO: habilitar N salas
+const idSala = 0; // TODO: habilitar N salas
 provide("idSala", idSala); // TODO: usar dbRefs.value.sala ao invés e remover
 
 const idJogadorEuProprio = ref("NONE");
 provide("idJogadorEuProprio", idJogadorEuProprio);
-
-const dbRefs = computed(() => {
-  return {
-    paravras: dbRef(db, "palavras"),
-    sala: dbRef(db, "salas/" + idSala.value),
-    etapa: dbRef(db, "salas/" + idSala.value + "/etapa"),
-    mediador: dbRef(db, "salas/" + idSala.value + "/mediador"),
-    eu: {
-      apelido: dbRef(
-        db, "salas/" + idSala.value + "/jogadores/" + idJogadorEuProprio.value + "/apelido"
-      ),
-      definicao: dbRef(
-        db, "salas/" + idSala.value + "/jogadores/" + idJogadorEuProprio.value + "/definicao"
-      ),
-      votouEm: dbRef(
-        db, "salas/" + idSala.value + "/jogadores/" + idJogadorEuProprio.value + "/votou_em"
-      )
-    }
-  };
-});
-provide("dbRefs", dbRefs);
 
 const isMediador = computed(() => {
   return sala.value.mediador === idJogadorEuProprio.value;
@@ -52,13 +29,13 @@ provide("isMediador", isMediador);
 const sala = ref({ jogadores: [], mediador: "", palavra: "" });
 provide("sala", sala);
 
-onValue(dbRefs.value.sala, (snapshot) => {
-  sala.value = snapshot.val();
+onValue(dbRef("salas/" + idSala), (snapshot) => {
+  sala.value = { ...snapshot.val(), id: idSala };
 });
 
 function mudaEtapa(etapa) {
   if (isMediador.value) {
-    set(dbRefs.value.etapa, etapa);
+    set(dbRef("salas/" + idSala + "/etapa"), etapa);
   }
 }
 provide("mudaEtapa", mudaEtapa);

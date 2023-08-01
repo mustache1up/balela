@@ -26,9 +26,10 @@
 <script setup>
 import { ref, onMounted, inject } from "vue";
 import { set } from "@firebase/database";
+import { dbRef } from "../firebaseConfig";
 
-const dbRefs = inject("dbRefs");
 const sala = inject("sala");
+const idJogadorEuProprio = inject("idJogadorEuProprio");
 const isMediador = inject("isMediador");
 const mudaEtapa = inject("mudaEtapa");
 
@@ -36,7 +37,9 @@ const definicaoDoJogador = ref("");
 const tempoRestante = ref(0);
 
 function enviarDefinicao() {
-  set(dbRefs.eu.definicao, definicaoDoJogador.value);
+  set(
+    dbRef("salas/" + sala.value.id + "/jogadores/" + idJogadorEuProprio.value + "/definicao"), definicaoDoJogador.value
+  );
 }
 
 function calculaTempoRestante() {

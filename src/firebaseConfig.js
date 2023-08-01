@@ -1,5 +1,6 @@
 import { initializeApp } from "@firebase/app";
 import { getAuth, signInAnonymously } from "@firebase/auth";
+import { getDatabase, ref } from "@firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAuNj8REHIb-xH5-wR6HdMoRYST3Cz-HLs",
@@ -25,4 +26,11 @@ signInAnonymously(auth)
     console.log(error.message);
   });
 
+const db = getDatabase(firebaseApp);
+
+function dbRef(path) {
+  return ref(db, path);
+}
+
 export default firebaseApp;
+export { dbRef };
