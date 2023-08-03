@@ -15,6 +15,7 @@ import { ref, inject } from "vue";
 import { set } from "@firebase/database";
 import { dbRef } from "../firebaseConfig";
 
+const sala = inject("sala");
 const mudaEtapa = inject("mudaEtapa");
 const idJogadorEuProprio = inject("idJogadorEuProprio");
 
