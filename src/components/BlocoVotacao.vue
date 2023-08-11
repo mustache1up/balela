@@ -20,7 +20,7 @@
 
     <div v-if="estado.souMediador">
       <p>Faltam {{ qtdFaltaVotar }} votos!</p>
-      <button v-if="qtdFaltaVotar <= 0" @click="encerrarVotacao">Encerrar votação</button>
+      <button v-if="qtdFaltaVotar <= 0" @click="encerrarRodada">Encerrar votação</button>
     </div>
   </div>
 </template>
@@ -106,17 +106,21 @@ function definirProximoMediador() {
   return idJogadores[indiceProximoMediador];
 }
 
-function encerrarVotacao() {
+function encerrarRodada() {
   if (!estado.souMediador || qtdFaltaVotar.value > 0) {
     return;
   }
 
-  const pontosDaRodada = calculaPontosDaRodada();
+  const pontosDaRodadaPorJogador = calculaPontosDaRodada();
 
   const salaUpdates = {};
-  _.each(pontosDaRodada, (pontosDaRodada, idJogador) => {
+
+  _.each(estado.sala.jogadores, (jogadorDaSala, idJogador) => {
+    const pontosDaRodada = pontosDaRodadaPorJogador[idJogador] || 0;
     salaUpdates[`jogadores/${idJogador}/pontos_ultima_rodada`] = pontosDaRodada;
     salaUpdates[`jogadores/${idJogador}/pontos`] = increment(pontosDaRodada);
+    salaUpdates[`jogadores/${idJogador}/definicao`] = null;
+    salaUpdates[`jogadores/${idJogador}/votou_em`] = null;
   });
 
   salaUpdates["etapa"] = "preparacao";

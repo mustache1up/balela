@@ -60,10 +60,6 @@ function iniciarRodada() {
       const fimTempo = Math.round(Date.now() / 1000) + tempoParaDefinicoesEmSegundos;
 
       const salaUpdates = {};
-      for (const [idJogador] of Object.entries(estado.sala.jogadores)) {
-        salaUpdates[`jogadores/${idJogador}/definicao`] = null;
-        salaUpdates[`jogadores/${idJogador}/votou_em`] = null;
-      }
       salaUpdates["fim_tempo"] = fimTempo;
       salaUpdates["palavra"] = palavra;
       salaUpdates[`jogadores/${estado.sala.mediador}/definicao`] = definicao;
