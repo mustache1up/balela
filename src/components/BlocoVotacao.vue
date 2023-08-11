@@ -2,23 +2,23 @@
   <div>
     <h1>Votação</h1>
 
-    <p>Palavra: {{ sala.palavra || 'PALAVRA AQUI' }}</p>
+    <p>Palavra: {{ estado.sala.palavra || 'PALAVRA AQUI' }}</p>
 
-    <p v-if="isMediador">Você é o mediador da rodada!</p>
-    <p v-if="!isMediador">
+    <p v-if="estado.souMediador">Você é o mediador da rodada!</p>
+    <p v-if="!estado.souMediador">
       Mediador da rodada:
-      {{ sala.jogadores[sala.mediador]?.apelido || 'MEDIADOR AQUI' }}
+      {{ estado.sala.jogadores[estado.sala.mediador]?.apelido || 'MEDIADOR AQUI' }}
     </p>
 
     <div v-for="def in definicoesPreparada" :key="def.letra">
-      <p v-if="isMediador">Definição {{ def.letra }}: {{ def.texto }}</p>
-      <button v-if="!isMediador" @click="votar(def.idJogador)">
+      <p v-if="estado.souMediador">Definição {{ def.letra }}: {{ def.texto }}</p>
+      <button v-if="!estado.souMediador" @click="votar(def.idJogador)">
         Definição {{ def.letra }}: {{ votos[def.idJogador] || 0 }} votos
         {{ def.idJogador === meuVoto ? '*votado*' : '' }}
       </button>
     </div>
 
-    <div v-if="isMediador">
+    <div v-if="estado.souMediador">
       <p>Faltam {{ qtdFaltaVotar }} votos!</p>
       <button v-if="qtdFaltaVotar <= 0" @click="encerrarVotacao">Encerrar votação</button>
     </div>
@@ -32,18 +32,14 @@ import { increment } from "@firebase/database";
 import { db } from "../firebaseConfig";
 import sha1 from "crypto-js/sha1";
 
-
-const sala = inject("sala");
-const idJogadorEuProprio = inject("idJogadorEuProprio");
-const isMediador = inject("isMediador");
-const mudaEtapa = inject("mudaEtapa");
+const estado = inject("estado");
 
 const meuVoto = computed(() => {
-  return sala.value.jogadores[idJogadorEuProprio]?.votou_em;
+  return estado.sala.jogadores[estado.meuIdJogador]?.votou_em;
 });
 
 const definicoesPreparada = computed(() => {
-  return _(sala.value.jogadores)
+  return _(estado.sala.jogadores)
     .map((jogadorDaSala, idJogador) => {
       const hash = sha1(jogadorDaSala.definicao).toString();
       return { hash, idJogador, texto: jogadorDaSala.definicao };
@@ -57,31 +53,31 @@ const definicoesPreparada = computed(() => {
 });
 
 const votos = computed(() => {
-  return _(sala.value.jogadores).countBy("votou_em").value();
+  return _(estado.sala.jogadores).filter("votou_em").countBy("votou_em").value();
 });
 
 const qtdFaltaVotar = computed(() => {
-  const qtdJogadores = _.reject(sala.value.jogadores, (o, k) => {
-    return k === sala.value.mediador;
+  const qtdJogadores = _.reject(estado.sala.jogadores, (o, k) => {
+    return k === estado.sala.mediador;
   }).length;
-  const qtdTotalVotos = _.filter(sala.value.jogadores, "votou_em").length;
+  const qtdTotalVotos = _.filter(estado.sala.jogadores, "votou_em").length;
   return qtdJogadores - qtdTotalVotos;
 });
 
 function votar(idJogadorNoQualVotar) {
-  if (isMediador.value) {
+  if (estado.souMediador) {
     return;
   }
 
-  db.set("salas/" + sala.value.id + "/jogadores/" + idJogadorEuProprio.value + "/votou_em", idJogadorNoQualVotar);
+  db.set(`salas/${estado.sala.id}/jogadores/${estado.meuIdJogador}/votou_em`, idJogadorNoQualVotar);
 }
 
 function calculaPontosDaRodada() {
-  const pontosDaRodada = _.mapValues(sala.value.jogadores, () => 0);
-  const idMediador = sala.value.mediador;
+  const pontosDaRodada = _.mapValues(estado.sala.jogadores, () => 0);
+  const idMediador = estado.sala.mediador;
   pontosDaRodada[idMediador] = 3;
 
-  _.each(sala.value.jogadores, (jogadorDaSala, idJogadorQueVotou) => {
+  _.each(estado.sala.jogadores, (jogadorDaSala, idJogadorQueVotou) => {
     const idJogadorQueRecebeuOVoto = jogadorDaSala.votou_em;
     if (idJogadorQueVotou === idMediador) {
       // mediador nao vota, nada a fazer
@@ -104,32 +100,31 @@ function calculaPontosDaRodada() {
 }
 
 function definirProximoMediador() {
-  const idJogadores = Object.keys(sala.value.jogadores);
-  const indiceMediadorAtual = idJogadores.indexOf(sala.value.mediador);
+  const idJogadores = Object.keys(estado.sala.jogadores);
+  const indiceMediadorAtual = idJogadores.indexOf(estado.sala.mediador);
   const indiceProximoMediador = (indiceMediadorAtual + 1) % idJogadores.length;
   return idJogadores[indiceProximoMediador];
 }
 
 function encerrarVotacao() {
-  if (!isMediador.value || qtdFaltaVotar.value > 0) {
+  if (!estado.souMediador || qtdFaltaVotar.value > 0) {
     return;
   }
+
   const pontosDaRodada = calculaPontosDaRodada();
 
   const salaUpdates = {};
   _.each(pontosDaRodada, (pontosDaRodada, idJogador) => {
-    salaUpdates["jogadores/" + idJogador + "/pontos_ultima_rodada"] = pontosDaRodada;
-    salaUpdates["jogadores/" + idJogador + "/pontos"] = increment(pontosDaRodada);
+    salaUpdates[`jogadores/${idJogador}/pontos_ultima_rodada`] = pontosDaRodada;
+    salaUpdates[`jogadores/${idJogador}/pontos`] = increment(pontosDaRodada);
   });
 
-  db.update("salas/" + sala.value.id, salaUpdates)
-    .then(() => {
-      return mudaEtapa("preparacao");
-    })
-    .then(() => {
-      const idProximoMediador = definirProximoMediador();
-      db.set("salas/" + sala.value.id + "/mediador", idProximoMediador);
-    });
+  salaUpdates["etapa"] = "preparacao";
+  
+  const idProximoMediador = definirProximoMediador();
+  salaUpdates["mediador"] = idProximoMediador;
+
+  db.update(`salas/${estado.sala.id}`, salaUpdates);
 }
 </script>
 

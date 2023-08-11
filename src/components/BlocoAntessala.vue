@@ -14,16 +14,12 @@
 import { ref, inject } from "vue";
 import { db } from "../firebaseConfig";
 
-const sala = inject("sala");
-const mudaEtapa = inject("mudaEtapa");
-const idJogadorEuProprio = inject("idJogadorEuProprio");
+const estado = inject("estado");
 
 const apelido = ref("");
 
 function entrarNaSala() {
-  db.set("salas/" + sala.value.id + "/jogadores/" + idJogadorEuProprio.value + "/apelido", apelido.value);
-
-  mudaEtapa("definicoes");
+  db.set(`salas/${estado.idSala}/jogadores/${estado.meuIdJogador}/apelido`, apelido.value);
 }
 </script>
 

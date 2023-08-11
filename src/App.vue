@@ -1,69 +1,62 @@
 <template>
-  <component :is="telaAtual" />
+  <component :is="telaAtual" :estado="estado" />
 </template>
 
 <script setup>
 import _ from "lodash";
-import { ref, computed, provide } from "vue";
+import { ref, computed, reactive, provide } from "vue";
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
 import { db } from "./firebaseConfig";
 
-import ConexaoPage from "./components/ConexaoPage.vue";
-import LobbyPage from "./components/LobbyPage.vue";
-import PreparacaoPage from "./components/PreparacaoPage.vue";
-import DefinicoesPage from "./components/DefinicoesPage.vue";
-import VotacaoPage from "./components/VotacaoPage.vue";
+import BlocoConexao from "./components/BlocoConexao.vue";
+import BlocoAntessala from "./components/BlocoAntessala.vue";
+import BlocoPreparacao from "./components/BlocoPreparacao.vue";
+import BlocoDefinicoes from "./components/BlocoDefinicoes.vue";
+import BlocoVotacao from "./components/BlocoVotacao.vue";
 
-const idSala = 0; // TODO: habilitar N salas
-provide("idSala", idSala); // TODO: usar dbs.value.sala ao invés e remover
-
-const idJogadorEuProprio = ref("NONE");
-provide("idJogadorEuProprio", idJogadorEuProprio);
-
-const isMediador = computed(() => {
-  return sala.value.mediador === idJogadorEuProprio.value;
+const estado = reactive({
+  idSala: 0, // TODO: habilitar N salas
+  meuIdJogador: "DESLOGADO",
+  souMediador: false,
+  sala: {}
 });
-provide("isMediador", isMediador);
+provide("estado", estado);
 
-const sala = ref({ jogadores: [], mediador: "", palavra: "" });
-provide("sala", sala);
+const sala = ref();
 
-db.onValue("salas/" + idSala, (snapshot) => {
-  sala.value = { ...snapshot.val(), id: idSala };
+db.onValue(`salas/${estado.idSala}`, (snapshot) => {
+  estado.sala = { ...snapshot.val(), id: estado.idSala };
+  estado.souMediador = estado.sala.mediador === estado.meuIdJogador;
 });
-
-function mudaEtapa(etapa) {
-  if (isMediador.value) {
-    db.set("salas/" + idSala + "/etapa", etapa);
-  }
-}
-provide("mudaEtapa", mudaEtapa);
 
 onAuthStateChanged(getAuth(), (user) => {
   if (user) {
-    idJogadorEuProprio.value = user.uid;
-    console.log("USER " + user.uid + " SIGNED");
+    estado.meuIdJogador = user.uid;
+    console.log(`Usuário logado com ID ${user.uid}`);
   } else {
-    console.log("USER NOT SIGNED");
+    console.log("Usuário deslogado");
   }
 });
 
 const telaAtual = computed(() => {
-  const contem = Object.keys(sala.value.jogadores).includes(idJogadorEuProprio.value);
-  if (!contem) {
-    return LobbyPage;
+  if (!estado.sala.etapa) {
+    return BlocoConexao;
   }
 
-  switch (sala.value.etapa) {
-    case "lobby":
+  const jogadorEstaNaSala = Object.keys(estado.sala.jogadores).includes(estado.meuIdJogador);
+  if (!jogadorEstaNaSala) {
+    return BlocoAntessala;
+  }
+
+  switch (estado.sala.etapa) {
     case "preparacao":
-      return PreparacaoPage;
+      return BlocoPreparacao;
     case "definicoes":
-      return DefinicoesPage;
+      return BlocoDefinicoes;
     case "votacao":
-      return VotacaoPage;
+      return BlocoVotacao;
     default:
-      return ConexaoPage;
+      return BlocoConexao;
   }
 });
 </script>

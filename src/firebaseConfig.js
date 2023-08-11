@@ -19,7 +19,7 @@ const auth = getAuth(firebaseApp);
 
 signInAnonymously(auth)
   .then(() => {
-    console.log("User logged in anonymously");
+    console.log("Sucesso no login");
   })
   .catch((error) => {
     console.log(error.code);
