@@ -1,6 +1,6 @@
 import { initializeApp } from "@firebase/app";
 import { getAuth, signInAnonymously } from "@firebase/auth";
-import { getDatabase, ref } from "@firebase/database";
+import { getDatabase, get, ref, set, update, onValue } from "@firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAuNj8REHIb-xH5-wR6HdMoRYST3Cz-HLs",
@@ -26,11 +26,25 @@ signInAnonymously(auth)
     console.log(error.message);
   });
 
-const db = getDatabase(firebaseApp);
+const firebaseDB = getDatabase(firebaseApp);
 
-function dbRef(path) {
-  return ref(db, path);
-}
+const db = {
+  ref: (path) => {
+    return ref(firebaseDB, path);
+  },
+  set: (path, value) => {
+    return set(ref(firebaseDB, path), value);
+  },
+  update: (path, values) => {
+    return update(ref(firebaseDB, path), values);
+  },
+  onValue: (path, callback, cancelCallback) => {
+    return onValue(ref(firebaseDB, path), callback, cancelCallback);
+  },
+  get: (path, callback, cancelCallback) => {
+    return get(ref(firebaseDB, path), callback, cancelCallback);
+  }
+};
 
 export default firebaseApp;
-export { dbRef };
+export { db };

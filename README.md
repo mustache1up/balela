@@ -1,21 +1,23 @@
-# balela-game
+# Balela
 
-## Project setup
+Neste jogo de palavras você precisa descobrir a definição correta da enquanto convence os demais com sua própria definição!
+
+## Download das dependências
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Compila e habilita 'hot-reload' para desenvolvimento
 ```
 npm run dev
 ```
 
-### Compiles and minifies for production
+### Compila e minifica o projeto para implantação
 ```
 npm run build
 ```
 
-### Lints and fixes files
+### Aplica verificações estáticas no código
 ```
 npm run lint
 ```

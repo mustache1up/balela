@@ -5,9 +5,8 @@
 <script setup>
 import _ from "lodash";
 import { ref, computed, provide } from "vue";
-import { onValue, set } from "@firebase/database";
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
-import { dbRef } from "./firebaseConfig";
+import { db } from "./firebaseConfig";
 
 import ConexaoPage from "./components/ConexaoPage.vue";
 import LobbyPage from "./components/LobbyPage.vue";
@@ -16,7 +15,7 @@ import DefinicoesPage from "./components/DefinicoesPage.vue";
 import VotacaoPage from "./components/VotacaoPage.vue";
 
 const idSala = 0; // TODO: habilitar N salas
-provide("idSala", idSala); // TODO: usar dbRefs.value.sala ao invés e remover
+provide("idSala", idSala); // TODO: usar dbs.value.sala ao invés e remover
 
 const idJogadorEuProprio = ref("NONE");
 provide("idJogadorEuProprio", idJogadorEuProprio);
@@ -29,13 +28,13 @@ provide("isMediador", isMediador);
 const sala = ref({ jogadores: [], mediador: "", palavra: "" });
 provide("sala", sala);
 
-onValue(dbRef("salas/" + idSala), (snapshot) => {
+db.onValue("salas/" + idSala, (snapshot) => {
   sala.value = { ...snapshot.val(), id: idSala };
 });
 
 function mudaEtapa(etapa) {
   if (isMediador.value) {
-    set(dbRef("salas/" + idSala + "/etapa"), etapa);
+    db.set("salas/" + idSala + "/etapa", etapa);
   }
 }
 provide("mudaEtapa", mudaEtapa);
