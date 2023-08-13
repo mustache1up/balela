@@ -1,4 +1,4 @@
-name: Build e Publicacao
+name: CI/CD
 
 on:
   push:
@@ -56,6 +56,6 @@ jobs:
     
     steps:
     
-      - name: Deploy no GitHub Pages
+      - name: 🚀 Deploy no GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2

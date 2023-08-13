@@ -1,3 +1,5 @@
+[![CI/CD](https://github.com/mustache1up/balela/actions/workflows/vite.yml/badge.svg)](https://github.com/mustache1up/balela/actions/workflows/vite.yml)
+
 # Balela
 
 Neste jogo de palavras você precisa descobrir a definição correta da enquanto convence os demais com sua própria definição!
