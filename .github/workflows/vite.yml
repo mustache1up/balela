@@ -36,7 +36,7 @@ jobs:
         uses: actions/configure-pages@v3
           
       - name: 🏗️ Build
-        run: npm install && npm run build
+        run: npm install && npm run build -- --base='/balela/'
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
