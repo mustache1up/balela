@@ -32,13 +32,16 @@ jobs:
           node-version: "18.x"
           cache: "npm"
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
+      - name: 🔗 Prepara dependências
+        run: npm install
           
       - name: 🏗️ Build
-        run: npm install && npm run build -- --base='/balela/'
-        
-      - name: Upload artifact
+        run: npm run build -- --base="/${GITHUB_REPOSITORY/*\//}/"
+
+      - name: 🔧 Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: ⬆️ Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
           path: './dist'
@@ -53,6 +56,6 @@ jobs:
     
     steps:
     
-      - name: Deploy to GitHub Pages
+      - name: Deploy no GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
