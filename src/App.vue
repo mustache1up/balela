@@ -1,4 +1,5 @@
 <template>
+  <h1>Balela!</h1>
   <component :is="telaAtual" :estado="estado" />
 </template>
 

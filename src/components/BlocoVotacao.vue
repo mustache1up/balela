@@ -1,25 +1,51 @@
 <template>
   <div>
-    <h1>Votação</h1>
+    <h2>Votação</h2>
 
-    <p>Palavra: {{ estado.sala.palavra || 'PALAVRA AQUI' }}</p>
+    <h3>Palavra: <b> {{ estado.sala.palavra || 'não definida' }} </b></h3>
 
-    <p v-if="estado.souMediador">Você é o mediador da rodada!</p>
-    <p v-if="!estado.souMediador">
-      Mediador da rodada:
-      {{ estado.sala.jogadores[estado.sala.mediador]?.apelido || 'MEDIADOR AQUI' }}
+    <p>
+      <b>
+        <span v-if="estado.souMediador">
+          Você
+        </span>
+        <span v-if="!estado.souMediador">
+          {{ estado.sala.jogadores[estado.sala.mediador]?.apelido || 'Não sabemos quem' }}
+        </span>
+      </b> 
+      é o mediador dessa rodada 🤠
     </p>
 
-    <div v-for="def in definicoesPreparada" :key="def.letra">
-      <p v-if="estado.souMediador">Definição {{ def.letra }}: {{ def.texto }}</p>
-      <button v-if="!estado.souMediador" @click="votar(def.idJogador)">
-        Definição {{ def.letra }}: {{ votos[def.idJogador] || 0 }} votos
-        {{ def.idJogador === meuVoto ? '*votado*' : '' }}
-      </button>
-    </div>
+    <h3>Dica</h3>
 
     <div v-if="estado.souMediador">
-      <p>Faltam {{ qtdFaltaVotar }} votos!</p>
+      <p>Leia as definições para os jogadores de forma a não evidenciar qual é a correta.</p>
+      <p>Você ganha um ponto para cada jogador que <b>não</b> votar na correta!</p>
+    </div>
+    <div v-if="!estado.souMediador">
+      <p>Ouça atentamente às definições que o mediador lerá e vote na que acredita ser correta.</p>
+      <p>Votando na correta você ganha dois pontos!</p>
+    </div>
+
+    <h3>Definições</h3>
+
+    <div v-for="def in definicoesPreparada" :key="def.letra">
+      <p v-if="estado.souMediador">
+        Definição {{ def.letra }}: {{ def.texto }}
+      </p>
+      <div v-if="!estado.souMediador">
+        <button @click="votar(def.idJogador)">
+        Definição {{ def.letra }}: {{ votos[def.idJogador] || 0 }} votos
+        </button>
+        {{ def.idJogador === meuVoto ? '*votei nessa!*' : '' }}
+      </div>
+    </div>
+    
+    <br />
+    <p v-if="qtdFaltaVotar > 0">Falta {{ qtdFaltaVotar }} votos!</p>
+    <p v-if="qtdFaltaVotar == 0">Todos votaram!</p>
+
+    <div v-if="estado.souMediador">
       <button v-if="qtdFaltaVotar <= 0" @click="encerrarRodada">Encerrar votação</button>
     </div>
   </div>

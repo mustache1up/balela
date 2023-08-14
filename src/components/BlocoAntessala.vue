@@ -1,13 +1,12 @@
 <template>
-  <div>
-    <h1>Salas de Jogo</h1>
-    <p>Sala Mandra *selecionada*</p>
-    <div>
-      <label for="apelido">Escreva seu apelido:</label>
-      <input type="text" id="apelido" v-model="apelido" />
-      <button @click="entrarNaSala">Entrar na sala</button>
-    </div>
-  </div>
+  <h2>Escolha a sala</h2>
+  <ul>
+    <li>Sala Mandra <i>*selecionada*</i></li>
+  </ul>
+  <h2>Escreva seu apelido</h2>
+  <input type="text" id="apelido" v-model="apelido" />
+  <br /><br />
+  <button @click="entrarNaSala">Entrar na sala</button>
 </template>
 
 <script setup>

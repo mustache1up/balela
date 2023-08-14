@@ -1,32 +1,40 @@
 <template>
+  <h3>Você está na <b>Sala Mandra</b></h3>
+
   <div>
-    <h1>Sala Mandra</h1>
-
-    <p>Nova rodada</p>
-
-    <p v-if="estado.souMediador">Você é o mediador da rodada!</p>
-    <p v-if="!estado.souMediador">
-      Mediador da rodada:
-      {{ estado.sala.jogadores[estado.sala.mediador]?.apelido || 'MEDIADOR AQUI' }}
+    <p class="item-jogador" v-for="(jogador, idJogador) in estado.sala.jogadores" :key="idJogador">
+      <strong>{{ jogador.apelido }}</strong> ({{ jogador.pontos || 0 }} pontos)
+      <span v-if="jogador.pontos_ultima_rodada">
+        [{{ jogador.pontos_ultima_rodada }} da última rodada!]
+      </span>
+      <span v-if="idJogador === estado.sala.mediador">
+        [mediador]
+      </span>
+      <span v-if="idJogador === estado.meuIdJogador">
+        [você!]
+      </span>
     </p>
+  </div>
 
-    <h3>Jogadores na Sala:</h3>
-    <!-- TODO: marcar tags de "você!" e "mediador"  -->
-    <div>
-      <p class="item-jogador" v-for="(jogador, idJogador) in estado.sala.jogadores" :key="idJogador">
-        <strong>{{ jogador.apelido }}</strong> ({{ jogador.pontos || 0 }} pontos)
-        <span v-if="jogador.pontos_ultima_rodada">
-          [{{ jogador.pontos_ultima_rodada }} da última rodada!]
-        </span>
-      </p>
-    </div>
+  <h3>Preparativos da nova rodada</h3>
+  <p>
+    <b>
+      <span v-if="estado.souMediador">
+        Você
+      </span>
+      <span v-if="!estado.souMediador">
+        {{ estado.sala.jogadores[estado.sala.mediador]?.apelido || 'Não sabemos quem' }}
+      </span>
+    </b> 
+    é o mediador dessa rodada 🤠
+  </p>
 
-    <div v-if="estado.souMediador">
-      <button @click="iniciarRodada">Iniciar Rodada</button>
-    </div>
-    <div v-if="!estado.souMediador">
-      <p>A rodada já vai começar!</p>
-    </div>
+
+  <div v-if="estado.souMediador">
+    <button @click="iniciarRodada">Iniciar Rodada</button>
+  </div>
+  <div v-if="!estado.souMediador">
+    <p>A rodada já vai começar!</p>
   </div>
 </template>
 

@@ -1,18 +1,27 @@
 <template>
   <div>
-    <h1>Valendo!</h1>
+    <h2>Valendo!</h2>
 
-    <p>Palavra: {{ estado.sala.palavra || 'PALAVRA AQUI' }}</p>
+    <p>Palavra: {{ estado.sala.palavra || 'não definida' }}</p>
 
     <p v-if="estado.souMediador">Você é o mediador da rodada!</p>
     <p v-if="!estado.souMediador">
       Mediador da rodada:
-      {{ estado.sala.jogadores[estado.sala.mediador]?.apelido || 'MEDIADOR AQUI' }}
+      {{ estado.sala.jogadores[estado.sala.mediador]?.apelido || 'não definido!' }}
     </p>
+
+    <div v-if="!estado.souMediador">
+      <h3>Dica</h3>
+      <p>Escreve uma definição convincente para os demais jogadores.</p>
+      <p>Você ganha pontos para cada voto que sua definição receber!</p>
+    </div>
 
     <p v-if="estado.souMediador">Os jogadores estão escrevendo suas definições!</p>
     <div v-if="!estado.souMediador">
-      <label for="minhaDefinicao">Escreva sua definição:</label>
+      <label for="minhaDefinicao">
+        <b>Escreva sua definição:</b>
+      </label>
+      <br />
       <input type="text" id="minhaDefinicao" v-model="minhaDefinicao" />
       <button @click="enviarDefinicao">Enviar definição</button>
     </div>
