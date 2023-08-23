@@ -40,25 +40,28 @@ onAuthStateChanged(getAuth(), (user) => {
 });
 
 const telaAtual = computed(() => {
-  if (!estado.sala.etapa) {
-    return BlocoConexao;
-  }
 
-  const jogadorEstaNaSala = Object.keys(estado.sala.jogadores).includes(estado.meuIdJogador);
-  if (!jogadorEstaNaSala) {
-    return BlocoAntessala;
-  }
+  return BlocoDefinicoes; // TODO: mudar aqui para testar as telas
 
-  switch (estado.sala.etapa) {
-    case "preparacao":
-      return BlocoPreparacao;
-    case "definicoes":
-      return BlocoDefinicoes;
-    case "votacao":
-      return BlocoVotacao;
-    default:
-      return BlocoConexao;
-  }
+  // if (!estado.sala.etapa) {
+  //   return BlocoConexao;
+  // }
+
+  // const jogadorEstaNaSala = Object.keys(estado.sala.jogadores).includes(estado.meuIdJogador);
+  // if (!jogadorEstaNaSala) {
+  //   return BlocoAntessala;
+  // }
+
+  // switch (estado.sala.etapa) {
+  //   case "preparacao":
+  //     return BlocoPreparacao;
+  //   case "definicoes":
+  //     return BlocoDefinicoes;
+  //   case "votacao":
+  //     return BlocoVotacao;
+  //   default:
+  //     return BlocoConexao;
+  // }
 });
 </script>
 
