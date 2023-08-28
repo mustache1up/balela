@@ -2,7 +2,7 @@
 
 # Balela
 
-Neste jogo de palavras você precisa descobrir a definição correta da enquanto convence os demais com sua própria definição!
+Neste jogo de palavras você precisa descobrir a definição correta da palavra enquanto convence os demais com sua própria definição!
 
 ## Download das dependências
 ```
