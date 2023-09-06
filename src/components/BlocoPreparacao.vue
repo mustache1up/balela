@@ -5,13 +5,13 @@
     <p class="item-jogador" v-for="(jogador, idJogador) in estado.sala.jogadores" :key="idJogador">
       <strong>{{ jogador.apelido }}</strong>
       
-      <a role="button" class="outline pontuacao">
+      <a role="button" class="outline pontuacao vermelho">
         {{ jogador.pontos || 0 }}
       </a>
 
       <span v-if="jogador.pontos_ultima_rodada">
 
-        <a role="button" class="outline pontuacao">
+        <a role="button" class="outline pontuacao verde">
           + {{ jogador.pontos_ultima_rodada }} 
         </a>
      
@@ -105,5 +105,15 @@ function iniciarRodada() {
   color: blueviolet;
   border-color: blueviolet;
   padding: 3px 10px;
+}
+
+.vermelho {
+  color: red;
+  border-color: red;
+}
+
+.verde {
+  color: green;
+  border-color: green;
 }
 </style>
