@@ -1,7 +1,9 @@
 <template>
-  
-  <img src="balela-sem-fundo.png" style="margin-bottom: 60px"/>
-  <component :is="telaAtual" :estado="estado" />
+  <div class="container" >
+    <article>
+      <component :is="telaAtual" :estado="estado" />
+    </article>
+  </div>
 </template>
 
 <script setup>
@@ -42,7 +44,7 @@ onAuthStateChanged(getAuth(), (user) => {
 
 const telaAtual = computed(() => {
 
-  return BlocoDefinicoes; // TODO: mudar aqui para testar as telas
+  return BlocoAntessala; // TODO: mudar aqui para testar as telas
 
   // if (!estado.sala.etapa) {
   //   return BlocoConexao;
