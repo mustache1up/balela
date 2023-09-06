@@ -1,5 +1,6 @@
+
 <template>
-  <div>
+   <div>
     <h2>Votação</h2>
 
     <h3>Palavra: <b> {{ estado.sala.palavra || 'não definida' }} </b></h3>
@@ -28,19 +29,20 @@
     </div>
 
     <h3>Definições</h3>
-
     <div v-for="def in definicoesPreparada" :key="def.letra">
       <p v-if="estado.souMediador">
         Definição {{ def.letra }}: {{ def.texto }}
       </p>
       <div v-if="!estado.souMediador">
-        <button @click="votar(def.idJogador)">
-        Definição {{ def.letra }}: {{ votos[def.idJogador] || 0 }} votos
+        
+        <button @click="votar(def.idJogador)" :class="{ 'destaque-ativo': def.idJogador === meuVoto }">
+        Definição {{ def.letra }} : {{ votos[def.idJogador] || 0 }} votos
         </button>
-        {{ def.idJogador === meuVoto ? '*votei nessa!*' : '' }}
+        
+        {{ def.idJogador === meuVoto ? '' : '' }}
       </div>
     </div>
-    
+  
     <br />
     <p v-if="qtdFaltaVotar > 0">Falta {{ qtdFaltaVotar }} votos!</p>
     <p v-if="qtdFaltaVotar == 0">Todos votaram!</p>
@@ -158,6 +160,39 @@ function encerrarRodada() {
 }
 </script>
 
+
 <style>
-/* Estilos */
+/* Estilos botões*/
+button {
+  background-color:  #fff45d;
+  color: rgb(0, 0, 0);
+  border-color: #fff45d;
+  border-radius: 20px;
+  margin-left: 15px;  /* Afastamento do botão à esquerda da margem */
+  padding: 15px;
+  width: 300px; /* Largura desejada do botão */
+  height: 50px; /* Altura desejada do botão */
+  text-align: center; /* Alinhamento horizontal do texto */
+  line-height:0px; /* Alinhamento vertical do texto */
+}
+button:hover {
+  background-color: #feb52d;
+  border-color: #fff45d;
+  color: rgb(0, 0, 0);
+  padding: 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.8s;
+}
+.destaque-ativo {
+  background-color: #e77346;
+  border-color: #fff45d;
+  color: white;
+  padding: 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+.destaque-ativo::before {
+  content: "\1F3AF"; /* Símbolo da alternativa marcada */
+}
 </style>
