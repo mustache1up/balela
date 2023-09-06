@@ -3,15 +3,30 @@
 
   <div>
     <p class="item-jogador" v-for="(jogador, idJogador) in estado.sala.jogadores" :key="idJogador">
-      <strong>{{ jogador.apelido }}</strong> ({{ jogador.pontos || 0 }} pontos)
+      <strong>{{ jogador.apelido }}</strong>
+      
+      <a role="button" class="outline pontuacao">
+        {{ jogador.pontos || 0 }}
+      </a>
+
       <span v-if="jogador.pontos_ultima_rodada">
-        [{{ jogador.pontos_ultima_rodada }} da última rodada!]
+
+        <a role="button" class="outline pontuacao">
+          + {{ jogador.pontos_ultima_rodada }} 
+        </a>
+     
       </span>
       <span v-if="idJogador === estado.sala.mediador">
-        [mediador]
+        <a role="button" class="outline pontuacao">
+          mediador    
+        </a>
       </span>
       <span v-if="idJogador === estado.meuIdJogador">
-        [você!]
+
+        <a role="button" class="outline pontuacao">
+          você    
+        </a>
+       
       </span>
     </p>
   </div>
@@ -82,5 +97,13 @@ function iniciarRodada() {
 <style>
 .item-jogador {
   padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.pontuacao {
+  margin-left: 15px;
+  color: blueviolet;
+  border-color: blueviolet;
+  padding: 3px 10px;
 }
 </style>

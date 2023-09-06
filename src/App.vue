@@ -1,5 +1,6 @@
 <template>
-  <h1>Balela!</h1>
+  
+  <img src="balela-sem-fundo.png" style="margin-bottom: 60px"/>
   <component :is="telaAtual" :estado="estado" />
 </template>
 
