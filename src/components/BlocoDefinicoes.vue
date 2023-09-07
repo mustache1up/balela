@@ -25,7 +25,9 @@
       <input type="text" id="minhaDefinicao" v-model="minhaDefinicao" />
       <button @click="enviarDefinicao">Enviar definição</button>
     </div>
-
+    <div class="barra-container">
+      <div class="barra" :style="{ width: progresso}" :class="corDaBarra" ></div>
+    </div>
     <div>
       <p>Tempo restante: {{ tempoRestante }} segundos</p>
     </div>
@@ -39,14 +41,17 @@ import { db } from "../firebaseConfig";
 const estado = inject("estado");
 
 const minhaDefinicao = ref("");
-const tempoRestante = ref(0);
+const tempoTotal = ref(13);
+const tempoRestante = ref(tempoTotal.value);
+const progresso = ref("100%");
+const corDaBarra = ref("barra");
 
 function enviarDefinicao() {
   db.set(`salas/${estado.sala.id}/jogadores/${estado.meuIdJogador}/definicao`, minhaDefinicao.value);
 }
 
 function calculaTempoRestante() {
-  if (estado.sala.fim_tempo === undefined) {
+  if (estado.sala.fim_tempo === 0) {
     return 0;
   }
   return estado.sala.fim_tempo - Math.round(Date.now() / 1000);
@@ -54,18 +59,60 @@ function calculaTempoRestante() {
 
 async function contagemRegressiva() {
   while (tempoRestante.value >= 0) {
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    tempoRestante.value = calculaTempoRestante();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    tempoRestante.value -= 1;
+    progresso.value = ((tempoRestante.value / tempoTotal.value) * 100).toFixed(2) + "%";
+    if (tempoRestante.value <= 3) {
+      corDaBarra.value = "roxo"; // Mude para roxo quando o tempo estiver acabando
+    }
+    else if (tempoRestante.value <= 6) {
+      corDaBarra.value = "vermelho"; // Mude para vermelho quando o tempo estiver acabando
+    } 
+    else if (tempoRestante.value <= 10) {
+      corDaBarra.value = "amarelo"; // Mude para amarelo quando estiver quase acabando
+    }
   }
-  tempoRestante.value = 0; // evita mostrar tempo negativo
+  tempoRestante.value = 0; // Evita mostrar tempo negativo
   if (estado.souMediador) {
     db.set(`salas/${estado.sala.id}/etapa`, "votacao");
   }
 }
-
 onMounted(contagemRegressiva);
 </script>
 
 <style>
 /* Estilos */
+.barra-container {
+  width: 100%;
+  height: 20px;
+  background-color: #ccc;
+}
+
+.barra {
+  height: 100%;
+  width: 100%;
+  background-color: #4caf50; /* Cor de fundo da barra de progresso */
+  transition: width 1s linear; /* Transição suave da largura */
+}
+
+.roxo {
+  height: 100%;
+  width: 100%;
+  background-color: #6200ff; /* Cor de fundo da barra de progresso */
+  transition: 1s linear; /* Transição suave da largura */
+}
+
+.vermelho {
+  height: 100%;
+  width: 100%;
+  background-color: #ff0000; /* Cor de fundo da barra de progresso */
+  transition: 1s linear; /* Transição suave da largura */
+}
+
+.amarelo {
+  height: 100%;
+  width: 100%;
+  background-color: #fbff00; /* Cor de fundo da barra de progresso */
+  transition: 1s linear; /* Transição suave da largura */
+}
 </style>
