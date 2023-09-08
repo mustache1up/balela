@@ -44,7 +44,7 @@ onAuthStateChanged(getAuth(), (user) => {
 
 const telaAtual = computed(() => {
 
-  return BlocoAntessala; // TODO: mudar aqui para testar as telas
+  return BlocoDefinicoes; // TODO: mudar aqui para testar as telas
 
   // if (!estado.sala.etapa) {
   //   return BlocoConexao;

@@ -91,39 +91,52 @@ onMounted(contagemRegressiva);
 .barra-container {
   width: 100%;
   height: 20px;
-  background-color: #ccc;
+  background-color: #cccccc00;
 }
 
 .barra {
-  height: 100%;
+  text-align: right;
+  height: 12px;
   width: 100%;
+  border-radius: 15px;
   background-color: #4caf50; /* Cor de fundo da barra de progresso */
   transition: width 1s linear; /* Transição suave da largura */
+
+}
+
+.barra::before {
+  left: 16px;
+  top: -7px;
+  position:relative;
+  content: "\23F3"; /* Símbolo da alternativa marcada */
 }
 
 .roxo {
-  height: 100%;
+  height: 12px;
   width: 100%;
   background-color: #6200ff; /* Cor de fundo da barra de progresso */
-  transition: 1s linear; /* Transição suave da largura */
+  transition: 1s linear;
+ /* Transição suave da largura */
 }
 
 .vermelho {
-  height: 100%;
+  height: 12px;
   width: 100%;
   background-color: #ff0000; /* Cor de fundo da barra de progresso */
   transition: 1s linear; /* Transição suave da largura */
 }
 
 .amarelo {
-  height: 100%;
+  height: 12px;
   width: 100%;
   background-color: #fbff00; /* Cor de fundo da barra de progresso */
   transition: 1s linear; /* Transição suave da largura */
 }
+
 .sem-negrito {
   font-weight: 100;
 }
+
 .centralizado {
   text-align: center;
 }  
