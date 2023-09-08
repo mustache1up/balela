@@ -14,7 +14,9 @@
     <p v-if="estado.souMediador">Os jogadores estão escrevendo suas definições!</p>
     <div v-if="!estado.souMediador">
       
-      <input type="text" id="minhaDefinicao" v-model="minhaDefinicao" />
+      <textarea id="minhaDefinicao" v-model="minhaDefinicao" cols="40" rows="3">
+      </textarea>
+       
       <button @click="enviarDefinicao">Enviar definição</button>
     </div>
 
@@ -25,7 +27,7 @@
     <p v-if="estado.souMediador">Você é o mediador da rodada!</p>
     <p v-if="!estado.souMediador">
       Mediador da rodada:
-      {{ estado.sala.jogadores[estado.sala.mediador]?.apelido || 'não definido!' }}
+      {{ estado.sala?.jogadores?.[estado.sala?.mediador]?.apelido || 'não definido!' }}
     </p>
 
     <div v-if="!estado.souMediador">
