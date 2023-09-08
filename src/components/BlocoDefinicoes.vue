@@ -2,27 +2,21 @@
   <div>
     <h2>Valendo!</h2>
 
-    <p>Palavra: {{ estado.sala.palavra || 'não definida' }}</p>
-
-    <p v-if="estado.souMediador">Você é o mediador da rodada!</p>
-    <p v-if="!estado.souMediador">
-      Mediador da rodada:
-      {{ estado.sala.jogadores[estado.sala.mediador]?.apelido || 'não definido!' }}
+    <p>
+      <h4 class="centralizado"> 
+        {{ estado.sala.palavra || 'não definida' }}
+        <span class="sem-negrito">   
+          é:
+        </span>  
+      </h4>
     </p>
-
-    <div v-if="!estado.souMediador">
-      <h3>Dica</h3>
-      <p>Escreve uma definição convincente para os demais jogadores.</p>
-      <p>Você ganha pontos para cada voto que sua definição receber!</p>
-    </div>
 
     <p v-if="estado.souMediador">Os jogadores estão escrevendo suas definições!</p>
     <div v-if="!estado.souMediador">
-      <label for="minhaDefinicao">
-        <b>Escreva sua definição:</b>
-      </label>
-      <br />
-      <input type="text" id="minhaDefinicao" v-model="minhaDefinicao" />
+      
+      <textarea id="minhaDefinicao" v-model="minhaDefinicao" cols="40" rows="3">
+      </textarea>
+       
       <button @click="enviarDefinicao">Enviar definição</button>
     </div>
     <div class="barra-container">
@@ -30,6 +24,18 @@
     </div>
     <div>
       <p>Tempo restante: {{ tempoRestante }} segundos</p>
+    </div>
+
+    <p v-if="estado.souMediador">Você é o mediador da rodada!</p>
+    <p v-if="!estado.souMediador">
+      Mediador da rodada:
+      {{ estado.sala?.jogadores?.[estado.sala?.mediador]?.apelido || 'não definido!' }}
+    </p>
+
+    <div v-if="!estado.souMediador">
+      <h3>Dica</h3>
+      <p>Escreve uma definição convincente para os demais jogadores.</p>
+      <p>Você ganha pontos para cada voto que sua definição receber!</p>
     </div>
   </div>
 </template>
@@ -115,4 +121,10 @@ onMounted(contagemRegressiva);
   background-color: #fbff00; /* Cor de fundo da barra de progresso */
   transition: 1s linear; /* Transição suave da largura */
 }
+.sem-negrito {
+  font-weight: 100;
+}
+.centralizado {
+  text-align: center;
+}  
 </style>
