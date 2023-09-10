@@ -1,4 +1,7 @@
 <template>
+  <div class="logo">
+    <img src="balela-sem-fundo.png"/>
+  </div>
   <div class="container" >
     <article>
       <component :is="telaAtual" :estado="estado" />
@@ -69,5 +72,9 @@ const telaAtual = computed(() => {
 </script>
 
 <style>
-/* Estilos */
+@media screen and (prefers-color-scheme: dark) {
+	.logo {  
+    filter: invert(100%); 
+  }
+}
 </style>

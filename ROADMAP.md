@@ -11,11 +11,11 @@
 -   ✅ Melhorar a cara do *votei nessa!* [Tela Votação]
 -   ✅ Melhorar a cara do placar [Tela Preparação]
 -   🟩 Destacar a palavra da rodada [Varias Telas] [A]
--   🟩 Tornar o campo de definição multi-linhas [Tela Definição] [A]
+-   ✅ Tornar o campo de definição multi-linhas [Tela Definição] [A]
 -   ✅ Barra no topo com o nome do jogo [Geral]
 -   ✅ div retangular centralizada na tela para conter as telas [Geral]
 -   ✅ Criar logo do babela, que diferencia do resto dos textos (pode ser outra fonte/estilo) [Geral]
--   🟩 Mudar logo de acordo com o tema (claro/escuro) [A]
+-   ✅ Mudar logo de acordo com o tema (claro/escuro) [A]
 -   🟩 Tempo restante mostrar animação que demonstre a passagem do tempo (pode ser a barra de progresso enchendo) [Tela Definições] [V]
 - 
 - ++🟩 Auto definir o mediador -> o primeiro a entrar na sala [G]
