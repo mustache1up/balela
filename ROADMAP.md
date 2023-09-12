@@ -18,9 +18,9 @@
 -   ✅ Mudar logo de acordo com o tema (claro/escuro) [A]
 -   🟩 Tempo restante mostrar animação que demonstre a passagem do tempo (pode ser a barra de progresso enchendo) [Tela Definições] [V]
 - 
-- ++🟩 Auto definir o mediador -> o primeiro a entrar na sala [G]
+- ++✅ Auto definir o mediador -> o primeiro a entrar na sala [G]
 - 
-- ++🟩 Sala sem jogadores não pode impedir novos jogadores de entrar [G]
+- ++✅ Sala sem jogadores não pode impedir novos jogadores de entrar [G]
 - + 🟩 Se o mediador sair demorar mais de X tempo, auto-definir outro mediador (passar para o que entrou em segundo lugar na sala)
 - 
 - ++🟩 Jogadores que ficam off devem ser removidos automaticamente
