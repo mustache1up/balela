@@ -18,6 +18,9 @@ const estado = inject("estado");
 const apelido = ref("");
 
 function entrarNaSala() {
+  if (!estado.sala.jogadores) {
+    db.set(`salas/${estado.idSala}/mediador`, estado.meuIdJogador);
+  }
   db.set(`salas/${estado.idSala}/jogadores/${estado.meuIdJogador}/apelido`, apelido.value);
 }
 </script>
