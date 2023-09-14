@@ -4,7 +4,7 @@
   </div>
   <div class="container" >
     <article>
-      <component :is="telaAtual" :estado="estado" />
+      <component :is="telaAtual" />
     </article>
   </div>
 </template>
@@ -21,6 +21,14 @@ import BlocoPreparacao from "./components/BlocoPreparacao.vue";
 import BlocoDefinicoes from "./components/BlocoDefinicoes.vue";
 import BlocoVotacao from "./components/BlocoVotacao.vue";
 
+const telas = {
+  conexao: BlocoConexao,
+  antessala: BlocoAntessala,
+  preparacao: BlocoPreparacao,
+  definicoes: BlocoDefinicoes,
+  votacao: BlocoVotacao,
+};
+
 const estado = reactive({
   idSala: 0, // TODO: habilitar N salas
   meuIdJogador: "DESLOGADO",
@@ -28,8 +36,6 @@ const estado = reactive({
   sala: {}
 });
 provide("estado", estado);
-
-const sala = ref();
 
 db.onValue(`salas/${estado.idSala}`, (snapshot) => {
   estado.sala = { ...snapshot.val(), id: estado.idSala };
@@ -46,9 +52,16 @@ onAuthStateChanged(getAuth(), (user) => {
 });
 
 const telaAtual = computed(() => {
-
+  
   if (!estado.sala.etapa) {
+    console.log("Dados de sala ainda não disponíveis, aguardando na tela 'conexao'");
     return BlocoConexao;
+  }
+
+  const caminhoDaURL = new URL(window.location).pathname.replace("/", "");
+  if (caminhoDaURL && _(telas).has(caminhoDaURL)) {
+    console.log(`Forçando tela definida na URL: '${caminhoDaURL}'`);
+    return telas[caminhoDaURL];
   }
 
   const jogadorEstaNaSala = _(estado.sala.jogadores).has(estado.meuIdJogador);
