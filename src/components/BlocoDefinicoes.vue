@@ -2,14 +2,14 @@
   <div>
     <h2>Valendo!</h2>
 
-    <p>
+    <div>
       <h4 class="centralizado"> 
         {{ estado.sala.palavra || 'não definida' }}
         <span class="sem-negrito">   
           é:
         </span>  
       </h4>
-    </p>
+    </div>
 
     <p v-if="estado.souMediador">Os jogadores estão escrevendo suas definições!</p>
     <div v-if="!estado.souMediador">
