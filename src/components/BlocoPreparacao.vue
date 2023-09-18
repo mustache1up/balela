@@ -1,5 +1,6 @@
 <template>
-  <h3>Você está na <b>Sala Mandra</b></h3>
+  <h3 class="titulo">Você está na sala <b>{{ estado.sala.nome }}</b></h3>
+  <h4>Jogadores</h4>
 
   <div>
     <p class="item-jogador" v-for="(jogador, idJogador) in estado.sala.jogadores" :key="idJogador">
@@ -115,5 +116,9 @@ function iniciarRodada() {
 .verde {
   color: green;
   border-color: green;
+}
+
+.titulo {
+  margin: 0
 }
 </style>
