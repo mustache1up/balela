@@ -161,7 +161,7 @@ function encerrarRodada() {
 </script>
 
 
-<style>
+<style scoped>
 /* Estilos botões*/
 button {
   background-color:  #fff45d;

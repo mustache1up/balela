@@ -101,7 +101,7 @@ async function contagemRegressiva() {
 onMounted(contagemRegressiva);
 </script>
 
-<style>
+<style scoped>
 /* Estilos */
 .barra-container {
   width: 100%;

@@ -94,7 +94,7 @@ function iniciarRodada() {
 }
 </script>
 
-<style>
+<style scoped>
 .item-jogador {
   padding-left: 20px;
   margin-bottom: 10px;

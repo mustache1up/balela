@@ -82,7 +82,7 @@ const telaAtual = computed(() => {
 });
 </script>
 
-<style>
+<style scoped>
 @media screen and (prefers-color-scheme: dark) {
 	.logo {  
     filter: invert(100%); 

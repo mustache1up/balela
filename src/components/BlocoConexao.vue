@@ -8,6 +8,6 @@
 /* Script */
 </script>
 
-<style>
+<style scoped>
 /* Estilos */
 </style>

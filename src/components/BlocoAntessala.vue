@@ -25,6 +25,6 @@ function entrarNaSala() {
 }
 </script>
 
-<style>
+<style scoped>
 /* Estilos */
 </style>
