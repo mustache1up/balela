@@ -83,8 +83,8 @@ async function contagemRegressiva() {
     tempoRestante.value -= 1;
     progresso.value = ((tempoRestante.value / tempoTotal.value) * 100).toFixed(2) + "%";
     if (tempoRestante.value <= 3) {
-      corDaBarra.value = "roxo";
-      exibirSemTempo.value = !exibirSemTempo.value; // Alternar visibilidade da mensagem // Mude para roxo quando o tempo estiver acabando
+      corDaBarra.value = "roxo"; // Mude para roxo quando o tempo estiver acabando
+      exibirSemTempo.value = !exibirSemTempo.value; // Alternar visibilidade da mensagem
     }
     else if (tempoRestante.value <= 6) {
       corDaBarra.value = "vermelho"; // Mude para vermelho quando o tempo estiver acabando
@@ -133,25 +133,25 @@ onMounted(contagemRegressiva);
   transition: 1s linear; /* Transição suave da largura */
 }
 
-  .sem-tempo {
-    text-align: center;
-    font-size: 24px; /* Tamanho da fonte da mensagem */
-    color: #6200ff; /* Cor da mensagem */
-    margin-top: -27px; /* Espaçamento superior para separar da barra de progresso */
-    margin-left: 20px; /* Espaçamento esquerdo para separar da barra de progresso */
-  }
+.sem-tempo {
+  text-align: center;
+  font-size: 24px; /* Tamanho da fonte da mensagem */
+  color: #6200ff; /* Cor da mensagem */
+  margin-top: -27px; /* Espaçamento superior para separar da barra de progresso */
+  margin-left: 20px; /* Espaçamento esquerdo para separar da barra de progresso */
+}
 
-  .eMuitoRapido {
-    text-align: center;
-    font-size: 22px; /* Tamanho da fonte da mensagem */
-    color: #6200ff; /* Cor da mensagem */
-    margin-top: -55px; /* Espaçamento superior para separar da barra de progresso */
-    margin-left: 40px; /* Espaçamento esquerdo para separar da barra de progresso */
-  }
+.eMuitoRapido {
+  text-align: center;
+  font-size: 22px; /* Tamanho da fonte da mensagem */
+  color: #6200ff; /* Cor da mensagem */
+  margin-top: -55px; /* Espaçamento superior para separar da barra de progresso */
+  margin-left: 40px; /* Espaçamento esquerdo para separar da barra de progresso */
+}
 
-    .eMuitoRapido::after {
-      content: "\1F3C3"; /*run*/
-    }
+.eMuitoRapido::after {
+  content: "\1F3C3"; /*run*/
+}
 
 .vermelho {
   height: 12px;
@@ -174,6 +174,7 @@ onMounted(contagemRegressiva);
 .centralizado {
   text-align: center;
 }  
+
 .centralizado button {
   margin: 0 auto;   /* Centraliza horizontalmente o botão*/
   margin-bottom: 20px; /* Espaçamento superior para separar da barra de progresso */
