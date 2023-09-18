@@ -1,6 +1,6 @@
 <template>
   <div class="logo">
-    <img src="balela-sem-fundo.png"/>
+    <img src="/balela-sem-fundo.png"/>
   </div>
   <div class="container" >
     <article>
