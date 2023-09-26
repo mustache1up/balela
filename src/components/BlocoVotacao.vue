@@ -45,17 +45,14 @@
   
     <br />
     <p v-if="qtdFaltaVotar > 0">Falta {{ qtdFaltaVotar }} votos!</p>
-    <p v-if="qtdFaltaVotar == 0">Todos votaram!</p>
+    <p v-if="qtdFaltaVotar == 0">Todos votaram! Encerrando em...</p>
 
-    <div v-if="estado.souMediador">
-      <button v-if="qtdFaltaVotar <= 0" @click="encerrarRodada">Encerrar votação</button>
-    </div>
   </div>
 </template>
 
 <script setup>
 import _ from "lodash";
-import { computed, inject } from "vue";
+import { computed, inject, watch } from "vue";
 import { increment } from "@firebase/database";
 import { db } from "../firebaseConfig";
 import sha1 from "crypto-js/sha1";
@@ -158,6 +155,14 @@ function encerrarRodada() {
 
   db.update(`salas/${estado.sala.id}`, salaUpdates);
 }
+
+watch(qtdFaltaVotar, async (qtdFaltaVotarNovo) => {
+  if (qtdFaltaVotarNovo == 0) {
+    encerrarRodada();
+    
+  }
+})
+
 </script>
 
 
